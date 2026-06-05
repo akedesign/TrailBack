@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ambex TrailBack">
 <meta name="theme-color" content="#1C1C29">
-<title>Ambex TrailBack V0.1</title>
+<title>Ambex TrailBack V0.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -220,6 +220,72 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
 .dr-detail { font-size: 11px; color: #7070A0; margin-top: 2px; }
 .dr-badge { font-size: 13px; font-weight: 700; color: #a5b4fc; flex-shrink: 0; font-variant-numeric: tabular-nums; }
 
+.btn-community { background: linear-gradient(135deg,#7c3aed,#a855f7); color: #fff; box-shadow: 0 4px 20px rgba(124,58,237,.3); }
+
+/* COMMUNITY MODAL */
+.comm-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 250; flex-direction: column; }
+.comm-ov.show { display: flex; }
+.comm-sheet { background: #1C1C29; flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-top: calc(env(safe-area-inset-top,0px) + 48px); border-radius: 20px 20px 0 0; border-top: 0.5px solid rgba(255,255,255,0.1); }
+.comm-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 12px; border-bottom: 0.5px solid #2A2A3D; flex-shrink: 0; }
+.comm-header h2 { font-size: 17px; font-weight: 600; color: #c084fc; display: flex; align-items: center; gap: 8px; }
+.comm-close { background: rgba(255,255,255,0.06); border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #7070A0; font-size: 16px; font-family: 'Kanit',sans-serif; }
+.comm-tabs { display: flex; gap: 6px; padding: 10px 14px; flex-shrink: 0; border-bottom: 0.5px solid #2A2A3D; }
+.comm-tab { flex: 1; background: #1E1E2E; border: 0.5px solid #2A2A3D; border-radius: 10px; padding: 8px 4px; font-size: 12px; color: #7070A0; cursor: pointer; font-family: 'Kanit',sans-serif; text-align: center; transition: all .2s; }
+.comm-tab.active { background: rgba(124,58,237,0.2); border-color: rgba(124,58,237,0.5); color: #c084fc; }
+.comm-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 14px 24px; }
+.comm-page { display: none; }
+.comm-page.show { display: block; }
+
+/* Review card */
+.rv-card { background: #1E1E2E; border: 0.5px solid #2A2A3D; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+.rv-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.rv-user { font-size: 13px; font-weight: 500; color: #e2e8f0; }
+.rv-date { font-size: 10px; color: #7070A0; margin-top: 2px; }
+.rv-score { display: flex; align-items: center; gap: 4px; }
+.rv-score-num { font-size: 20px; font-weight: 700; color: #F44019; line-height: 1; }
+.rv-score-max { font-size: 11px; color: #7070A0; align-self: flex-end; margin-bottom: 2px; }
+.rv-stars { display: flex; gap: 2px; margin-bottom: 6px; }
+.rv-star { font-size: 14px; }
+.rv-type { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 2px 8px; border-radius: 20px; margin-bottom: 8px; }
+.rv-type.pos { background: rgba(74,222,128,0.12); color: #4ade80; border: 0.5px solid rgba(74,222,128,0.3); }
+.rv-type.neg { background: rgba(248,113,113,0.12); color: #f87171; border: 0.5px solid rgba(248,113,113,0.3); }
+.rv-type.neu { background: rgba(148,163,184,0.12); color: #94a3b8; border: 0.5px solid rgba(148,163,184,0.3); }
+.rv-text { font-size: 12px; color: #94a3b8; line-height: 1.6; }
+.rv-helpful { font-size: 11px; color: #7070A0; margin-top: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.rv-helpful.liked { color: #c084fc; }
+
+/* Stats bar */
+.comm-stats { background: #14142A; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+.cs-score { text-align: center; margin-bottom: 12px; }
+.cs-big { font-size: 48px; font-weight: 700; color: #F44019; line-height: 1; }
+.cs-sub { font-size: 12px; color: #7070A0; margin-top: 4px; }
+.cs-bars { display: flex; flex-direction: column; gap: 5px; }
+.cs-bar-row { display: flex; align-items: center; gap: 8px; }
+.cs-bar-lbl { font-size: 11px; color: #7070A0; width: 20px; text-align: right; flex-shrink: 0; }
+.cs-bar-track { flex: 1; height: 6px; background: #2A2A3D; border-radius: 3px; overflow: hidden; }
+.cs-bar-fill { height: 100%; border-radius: 3px; background: #F44019; transition: width .5s; }
+.cs-bar-cnt { font-size: 11px; color: #7070A0; width: 20px; flex-shrink: 0; }
+
+/* Write review form */
+.wr-form { background: #1E1E2E; border-radius: 12px; padding: 14px; }
+.wr-label { font-size: 11px; color: #7070A0; margin-bottom: 6px; letter-spacing: .04em; }
+.wr-name { width: 100%; background: #14142A; border: 0.5px solid #2A2A3D; border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #e8f5e9; outline: none; font-family: 'Kanit',sans-serif; margin-bottom: 12px; }
+.wr-name:focus { border-color: rgba(124,58,237,0.5); }
+.wr-score-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.wr-score-btn { width: 40px; height: 40px; border: 0.5px solid #2A2A3D; border-radius: 10px; background: #14142A; color: #7070A0; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'Kanit',sans-serif; transition: all .15s; }
+.wr-score-btn.sel { background: rgba(244,64,25,0.2); border-color: #F44019; color: #F44019; }
+.wr-type-row { display: flex; gap: 6px; margin-bottom: 12px; }
+.wr-type-btn { flex: 1; padding: 8px; border-radius: 10px; border: 0.5px solid #2A2A3D; background: #14142A; font-size: 12px; color: #7070A0; cursor: pointer; font-family: 'Kanit',sans-serif; text-align: center; transition: all .15s; }
+.wr-type-btn.sel-pos { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.4); color: #4ade80; }
+.wr-type-btn.sel-neg { background: rgba(248,113,113,0.12); border-color: rgba(248,113,113,0.4); color: #f87171; }
+.wr-type-btn.sel-neu { background: rgba(148,163,184,0.12); border-color: rgba(148,163,184,0.3); color: #94a3b8; }
+.wr-textarea { width: 100%; background: #14142A; border: 0.5px solid #2A2A3D; border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #e8f5e9; outline: none; font-family: 'Kanit',sans-serif; resize: none; height: 90px; margin-bottom: 12px; line-height: 1.6; }
+.wr-textarea:focus { border-color: rgba(124,58,237,0.5); }
+.wr-submit { width: 100%; border: none; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 500; cursor: pointer; background: linear-gradient(135deg,#7c3aed,#a855f7); color: #fff; font-family: 'Kanit',sans-serif; }
+.wr-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.comm-loading { text-align: center; padding: 32px; color: #7070A0; font-size: 13px; }
+.comm-empty { text-align: center; padding: 32px; color: #7070A0; font-size: 13px; line-height: 1.8; }
+
 /* SURVIVAL GUIDE MODAL */
 
 
@@ -294,7 +360,7 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
       </svg>
       <div>
         <div style="font-size:11px;font-weight:400;color:#8a2408;letter-spacing:0.12em;line-height:1;margin-bottom:1px">AMBEX</div>
-        <div style="font-size:16px;font-weight:700;color:#F44019;letter-spacing:0.03em;line-height:1">TrailBack <span style="font-size:10px;font-weight:400;color:#8a2408">V0.1</span></div>
+        <div style="font-size:16px;font-weight:700;color:#F44019;letter-spacing:0.03em;line-height:1">TrailBack <span style="font-size:10px;font-weight:400;color:#8a2408">V0.2</span></div>
       </div>
     </div>
     <div class="gps-pill">
@@ -446,6 +512,12 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
         </button>
       </div>
       <div class="btn-row">
+        <button class="btn btn-community btn-full" onclick="openCommunity()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          ชุมชน TrailBack
+        </button>
+      </div>
+      <div class="btn-row">
         <button class="btn btn-sos btn-full" id="sosBtn" onclick="toggleSOS()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           🆘 SOS Flashlight
@@ -535,6 +607,72 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
       หยุดนำทาง
     </button>
+  </div>
+</div>
+
+<!-- COMMUNITY MODAL -->
+<div class="comm-ov" id="commModal">
+  <div class="comm-sheet">
+    <div class="comm-header">
+      <h2>👥 ชุมชน TrailBack</h2>
+      <button class="comm-close" onclick="closeCommunity()">✕</button>
+    </div>
+    <div class="comm-tabs">
+      <div class="comm-tab active" onclick="commTab(0)">📊 ภาพรวม</div>
+      <div class="comm-tab" onclick="commTab(1)">💬 รีวิวทั้งหมด</div>
+      <div class="comm-tab" onclick="commTab(2)">✍️ เขียนรีวิว</div>
+    </div>
+    <div class="comm-content">
+
+      <!-- PAGE 0: ภาพรวม + stats -->
+      <div class="comm-page show" id="cpp0">
+        <div class="comm-stats">
+          <div class="cs-score">
+            <div class="cs-big" id="csAvg">—</div>
+            <div class="cs-sub" id="csTotalLabel">กำลังโหลด...</div>
+            <div style="display:flex;justify-content:center;gap:3px;margin-top:6px" id="csStars"></div>
+          </div>
+          <div class="cs-bars" id="csBars">
+            <div style="text-align:center;font-size:12px;color:#7070A0">กำลังโหลดข้อมูล...</div>
+          </div>
+        </div>
+        <div id="cpLatest">
+          <div class="comm-loading">⏳ กำลังโหลดรีวิวล่าสุด...</div>
+        </div>
+      </div>
+
+      <!-- PAGE 1: รีวิวทั้งหมด -->
+      <div class="comm-page" id="cpp1">
+        <div id="cpAllReviews">
+          <div class="comm-loading">⏳ กำลังโหลด...</div>
+        </div>
+      </div>
+
+      <!-- PAGE 2: เขียนรีวิว -->
+      <div class="comm-page" id="cpp2">
+        <div class="wr-form">
+          <div class="wr-label">ชื่อของคุณ</div>
+          <input class="wr-name" id="wrName" type="text" placeholder="ชื่อหรือนามแฝง..." maxlength="20">
+
+          <div class="wr-label">คะแนน (1–10)</div>
+          <div class="wr-score-row" id="wrScoreRow"></div>
+
+          <div class="wr-label">ประเภทรีวิว</div>
+          <div class="wr-type-row">
+            <button class="wr-type-btn" id="wt-pos" onclick="selectType('pos')">👍 แง่บวก</button>
+            <button class="wr-type-btn" id="wt-neg" onclick="selectType('neg')">👎 แง่ลบ</button>
+            <button class="wr-type-btn" id="wt-neu" onclick="selectType('neu')">🤝 กลางๆ</button>
+          </div>
+
+          <div class="wr-label">ความคิดเห็น</div>
+          <textarea class="wr-textarea" id="wrText" placeholder="แชร์ประสบการณ์ใช้งาน TrailBack..." maxlength="300"></textarea>
+
+          <button class="wr-submit" id="wrSubmit" onclick="submitReview()">ส่งรีวิว</button>
+          <div style="font-size:11px;color:#7070A0;text-align:center;margin-top:8px" id="wrMsg"></div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 
@@ -1733,6 +1871,232 @@ function stopSOS() {
   `;
 }
 
+// ── COMMUNITY ─────────────────────────────────────────────────────
+const REVIEWS_KEY = 'trailback-reviews-v1';
+const LIKES_KEY   = 'trailback-likes-v1';
+
+let commReviews = [];
+let wrScore = 0;
+let wrType  = '';
+let myLikes = JSON.parse(localStorage.getItem(LIKES_KEY) || '{}');
+
+// ── Storage helpers (Artifact persistent storage) ────────────────
+async function loadReviews() {
+  try {
+    const result = await window.storage.get(REVIEWS_KEY, true); // shared=true
+    commReviews = result ? JSON.parse(result.value) : [];
+  } catch(e) {
+    commReviews = [];
+  }
+}
+
+async function saveReviews() {
+  try {
+    await window.storage.set(REVIEWS_KEY, JSON.stringify(commReviews), true);
+  } catch(e) {
+    console.error('save error', e);
+  }
+}
+
+// ── Compute stats ─────────────────────────────────────────────────
+function computeStats() {
+  if (!commReviews.length) return null;
+  const avg = commReviews.reduce((s,r) => s + r.score, 0) / commReviews.length;
+  const dist = {};
+  for (let i = 1; i <= 10; i++) dist[i] = 0;
+  commReviews.forEach(r => { if (dist[r.score] !== undefined) dist[r.score]++; });
+  const max = Math.max(...Object.values(dist), 1);
+  return { avg: avg.toFixed(1), total: commReviews.length, dist, max };
+}
+
+// ── Render ────────────────────────────────────────────────────────
+function renderStars(score) {
+  const full = Math.round(score / 2); // 10pt → 5 stars
+  return Array.from({length:5}, (_,i) =>
+    `<span class="rv-star">${i < full ? '⭐' : '☆'}</span>`
+  ).join('');
+}
+
+function renderScoreBars(stats) {
+  const el = document.getElementById('csBars');
+  if (!stats) { el.innerHTML = '<div style="text-align:center;font-size:12px;color:#7070A0">ยังไม่มีรีวิว</div>'; return; }
+  let html = '';
+  for (let i = 10; i >= 1; i--) {
+    const cnt = stats.dist[i] || 0;
+    const pct = Math.round(cnt / stats.max * 100);
+    html += `<div class="cs-bar-row">
+      <div class="cs-bar-lbl">${i}</div>
+      <div class="cs-bar-track"><div class="cs-bar-fill" style="width:${pct}%"></div></div>
+      <div class="cs-bar-cnt">${cnt}</div>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderReviewCard(r, idx) {
+  const typeMap = { pos: ['pos','👍 แง่บวก'], neg: ['neg','👎 แง่ลบ'], neu: ['neu','🤝 กลางๆ'] };
+  const [tc, tl] = typeMap[r.type] || ['neu','🤝 กลางๆ'];
+  const liked = myLikes[r.id];
+  const date = new Date(r.ts).toLocaleDateString('th-TH', {day:'numeric',month:'short',year:'2-digit'});
+  return `<div class="rv-card">
+    <div class="rv-head">
+      <div>
+        <div class="rv-user">👤 ${r.name || 'ไม่ระบุชื่อ'}</div>
+        <div class="rv-date">${date}</div>
+      </div>
+      <div class="rv-score">
+        <div class="rv-score-num">${r.score}</div>
+        <div class="rv-score-max">/10</div>
+      </div>
+    </div>
+    <div class="rv-stars">${renderStars(r.score)}</div>
+    <div class="rv-type ${tc}">${tl}</div>
+    <div class="rv-text">${r.text}</div>
+    <div class="rv-helpful ${liked?'liked':''}" onclick="toggleLike('${r.id}', this)">
+      ${liked ? '💜' : '🤍'} เป็นประโยชน์ (${r.likes || 0})
+    </div>
+  </div>`;
+}
+
+function renderOverview() {
+  const stats = computeStats();
+  const avgEl = document.getElementById('csAvg');
+  const lbl   = document.getElementById('csTotalLabel');
+  const stars = document.getElementById('csStars');
+
+  if (!stats) {
+    avgEl.textContent = '—';
+    lbl.textContent = 'ยังไม่มีรีวิว — เป็นคนแรกได้เลย!';
+    stars.innerHTML = '';
+  } else {
+    avgEl.textContent = stats.avg;
+    lbl.textContent = `จาก ${stats.total} รีวิว`;
+    stars.innerHTML = renderStars(parseFloat(stats.avg));
+  }
+  renderScoreBars(stats);
+
+  // latest 3
+  const latest = [...commReviews].sort((a,b) => b.ts - a.ts).slice(0, 3);
+  const el = document.getElementById('cpLatest');
+  if (!latest.length) {
+    el.innerHTML = '<div class="comm-empty">ยังไม่มีรีวิว<br>กดแท็บ "เขียนรีวิว" เพื่อเป็นคนแรก!</div>';
+  } else {
+    el.innerHTML = '<div style="font-size:11px;color:#7070A0;margin-bottom:8px;letter-spacing:.04em">รีวิวล่าสุด</div>' +
+      latest.map((r,i) => renderReviewCard(r,i)).join('');
+  }
+}
+
+function renderAllReviews() {
+  const sorted = [...commReviews].sort((a,b) => b.ts - a.ts);
+  const el = document.getElementById('cpAllReviews');
+  if (!sorted.length) {
+    el.innerHTML = '<div class="comm-empty">ยังไม่มีรีวิว</div>';
+  } else {
+    el.innerHTML = sorted.map((r,i) => renderReviewCard(r,i)).join('');
+  }
+}
+
+// ── Interactions ──────────────────────────────────────────────────
+function selectScore(s) {
+  wrScore = s;
+  document.querySelectorAll('.wr-score-btn').forEach((b,i) => {
+    b.classList.toggle('sel', i+1 === s);
+  });
+}
+
+function selectType(t) {
+  wrType = t;
+  ['pos','neg','neu'].forEach(x => {
+    const btn = document.getElementById('wt-'+x);
+    btn.className = 'wr-type-btn' + (x===t ? ' sel-'+x : '');
+  });
+}
+
+async function toggleLike(id, el) {
+  if (myLikes[id]) { delete myLikes[id]; }
+  else { myLikes[id] = true; }
+  localStorage.setItem(LIKES_KEY, JSON.stringify(myLikes));
+  const r = commReviews.find(x => x.id === id);
+  if (r) {
+    r.likes = (r.likes || 0) + (myLikes[id] ? 1 : -1);
+    if (r.likes < 0) r.likes = 0;
+    await saveReviews();
+    const liked = !!myLikes[id];
+    el.className = 'rv-helpful' + (liked ? ' liked' : '');
+    el.innerHTML = `${liked?'💜':'🤍'} เป็นประโยชน์ (${r.likes})`;
+  }
+}
+
+async function submitReview() {
+  const name = document.getElementById('wrName').value.trim() || 'ไม่ระบุชื่อ';
+  const text = document.getElementById('wrText').value.trim();
+  const msg  = document.getElementById('wrMsg');
+
+  if (!wrScore) { msg.textContent = '⚠️ กรุณาเลือกคะแนน'; msg.style.color='#f87171'; return; }
+  if (!wrType)  { msg.textContent = '⚠️ กรุณาเลือกประเภทรีวิว'; msg.style.color='#f87171'; return; }
+  if (!text)    { msg.textContent = '⚠️ กรุณาเขียนความคิดเห็น'; msg.style.color='#f87171'; return; }
+
+  const btn = document.getElementById('wrSubmit');
+  btn.disabled = true;
+  btn.textContent = 'กำลังบันทึก...';
+  msg.textContent = '';
+
+  const review = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,5),
+    name, score: wrScore, type: wrType, text, ts: Date.now(), likes: 0
+  };
+
+  commReviews.push(review);
+  await saveReviews();
+
+  btn.disabled = false;
+  btn.textContent = 'ส่งรีวิว';
+  msg.textContent = '✅ ขอบคุณสำหรับรีวิว!';
+  msg.style.color = '#4ade80';
+
+  // reset form
+  wrScore = 0; wrType = '';
+  document.getElementById('wrName').value = '';
+  document.getElementById('wrText').value = '';
+  document.querySelectorAll('.wr-score-btn').forEach(b => b.classList.remove('sel'));
+  ['pos','neg','neu'].forEach(x => document.getElementById('wt-'+x).className='wr-type-btn');
+
+  // refresh stats + switch to overview
+  renderOverview();
+  renderAllReviews();
+  setTimeout(() => { commTab(0); msg.textContent=''; }, 1500);
+}
+
+// ── Open/close ────────────────────────────────────────────────────
+async function openCommunity() {
+  document.getElementById('commModal').classList.add('show');
+  document.getElementById('cpLatest').innerHTML = '<div class="comm-loading">⏳ กำลังโหลด...</div>';
+  await loadReviews();
+  renderOverview();
+  renderAllReviews();
+  // build score buttons
+  const row = document.getElementById('wrScoreRow');
+  if (!row.children.length) {
+    row.innerHTML = Array.from({length:10},(_,i) =>
+      `<button class="wr-score-btn" onclick="selectScore(${i+1})">${i+1}</button>`
+    ).join('');
+  }
+}
+
+function closeCommunity() {
+  document.getElementById('commModal').classList.remove('show');
+}
+
+function commTab(i) {
+  document.querySelectorAll('.comm-tab').forEach((t,j) => t.classList.toggle('active',j===i));
+  document.querySelectorAll('.comm-page').forEach((p,j) => p.classList.toggle('show',j===i));
+  if (i===1) renderAllReviews();
+}
+
+document.getElementById('commModal').addEventListener('click', function(e){
+  if (e.target===this) closeCommunity();
+});
+
 // ── SURVIVAL GUIDE ────────────────────────────────────────────────
 function openSurvival() {
   document.getElementById('survivalModal').classList.add('show');
@@ -1750,7 +2114,7 @@ document.getElementById('survivalModal').addEventListener('click', function(e) {
 
 // ── INIT ──────────────────────────────────────────────────────────
 document.addEventListener('touchmove', e => {
-  const allowed = e.target.closest('.panel, .sv-content, .sv-tabs, .survival-sheet, .share-sheet');
+  const allowed = e.target.closest('.panel, .sv-content, .sv-tabs, .survival-sheet, .share-sheet, .comm-content, .comm-sheet');
   if (!allowed) e.preventDefault();
 }, { passive: false });
 
