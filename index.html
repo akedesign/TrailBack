@@ -47,7 +47,7 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Kanit', -apple-sys
 .scale-label { font-size: 10px; color: #7070A0; font-variant-numeric: tabular-nums; }
 
 /* PANEL */
-.panel { background: #191924; border-top: 0.5px solid #2A2A3D; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: 52vh; padding-bottom: env(safe-area-inset-bottom, 12px); }
+.panel { background: #191924; border-top: 0.5px solid #2A2A3D; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: 56vh; padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 8px); }
 
 /* NAV CARD */
 .nav-card { display: none; margin: 12px 14px 0; background: #1E1E2E; border: 1px solid #c43315; border-radius: 14px; padding: 12px 14px; }
@@ -95,7 +95,7 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Kanit', -apple-sys
 .wp-empty { font-size: 12px; color: #7070A0; text-align: center; padding: 18px; }
 
 /* BUTTONS */
-.btn-section { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.btn-section { padding: 12px 14px 20px; display: flex; flex-direction: column; gap: 8px; }
 .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .btn { border: none; border-radius: 12px; padding: 14px 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; transition: transform 0.1s, opacity 0.1s; font-family: 'Kanit', sans-serif; }
 .btn:active { transform: scale(0.97); opacity: 0.85; }
