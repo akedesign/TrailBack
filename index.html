@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ambex TrailBack">
 <meta name="theme-color" content="#1C1C29">
-<title>Ambex TrailBack V0.5</title>
+<title>Ambex TrailBack V0.7</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -168,39 +168,37 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
 .sunset-bar.critical .sunset-progress { background: rgba(228,74,74,0.7); }
 
 /* FAB QUICK ACTION */
-.fab-wrap { position: fixed; bottom: calc(env(safe-area-inset-bottom,16px) + 20px); right: 20px; z-index: 90; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; max-width: 480px; }
-.fab-btn { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg,#C8340F,#F44019); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(244,64,25,.5); transition: transform .2s, box-shadow .2s; flex-shrink: 0; }
-.fab-btn:active { transform: scale(0.92); }
-.fab-btn svg { width: 24px; height: 24px; stroke: #fff; transition: transform .25s; }
-.fab-btn.open .fab-icon-open { transform: rotate(45deg); }
+.fab-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 10px 14px calc(env(safe-area-inset-bottom,16px) + 12px); width: 100%; }
+.fab-btn { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg,#C8340F,#F44019); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 24px rgba(244,64,25,.55); transition: transform .2s; flex-shrink: 0; }
+.fab-btn:active { transform: scale(0.91); }
+.fab-btn svg { width: 26px; height: 26px; stroke: #fff; transition: transform .25s; }
+.fab-btn.open svg.fab-icon-open { transform: rotate(45deg); }
 
-.fab-overlay { display: none; position: fixed; inset: 0; z-index: 89; background: rgba(11,14,23,0.6); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+.fab-overlay { display: none; position: fixed; inset: 0; z-index: 89; background: rgba(11,14,23,0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 .fab-overlay.show { display: block; }
 
-.fab-menu { display: none; flex-direction: column; align-items: flex-end; gap: 0; }
+.fab-menu { display: none; flex-direction: column; align-items: center; width: 100%; }
 .fab-menu.show { display: flex; }
-.fab-menu-label { font-size: 10px; color: rgba(148,163,184,0.5); letter-spacing: .08em; text-transform: uppercase; text-align: right; margin-bottom: 4px; font-family: 'Kanit', sans-serif; }
+.fab-menu-label { font-size: 10px; color: rgba(148,163,184,0.45); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; font-family: 'Kanit', sans-serif; }
 
-.fab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
-.fab-item { display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; border: none; background: none; padding: 4px; -webkit-tap-highlight-color: transparent; }
-.fab-item:active .fab-icon-wrap { transform: scale(0.93); }
+.fab-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; width: 100%; margin-bottom: 8px; }
+.fab-item { display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; border: none; background: none; padding: 2px; -webkit-tap-highlight-color: transparent; }
+.fab-item:active .fab-icon-wrap { transform: scale(0.91); }
 
-.fab-icon-wrap { width: 58px; height: 58px; border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: transform .15s; box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+.fab-icon-wrap { width: 100%; aspect-ratio: 1; border-radius: 18px; display: flex; align-items: center; justify-content: center; transition: transform .15s; box-shadow: 0 4px 16px rgba(0,0,0,.45); max-width: 64px; }
 .fab-icon-wrap svg { width: 26px; height: 26px; stroke: #fff; }
 .fab-purple { background: linear-gradient(135deg,#7c3aed,#a855f7); }
 .fab-red    { background: linear-gradient(135deg,#dc2626,#f87171); }
 .fab-amber  { background: linear-gradient(135deg,#b45309,#f59e0b); }
 .fab-gray   { background: linear-gradient(135deg,#374151,#6b7280); }
-.fab-label  { font-size: 12px; color: #e2e8f0; font-family: 'Kanit', sans-serif; font-weight: 300; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+.fab-label  { font-size: 11px; color: #e2e8f0; font-family: 'Kanit', sans-serif; font-weight: 300; white-space: nowrap; }
 
-/* animate items in */
-.fab-item { opacity: 0; transform: translateY(10px) scale(0.9); transition: opacity .2s, transform .2s; }
-.fab-menu.show .fab-item:nth-child(1) { opacity:1;transform:none;transition-delay:.05s }
-.fab-menu.show .fab-item:nth-child(2) { opacity:1;transform:none;transition-delay:.1s }
-.fab-menu.show .fab-item:nth-child(3) { opacity:1;transform:none;transition-delay:.15s }
-.fab-menu.show .fab-item:nth-child(4) { opacity:1;transform:none;transition-delay:.2s }
+.fab-item { opacity: 0; transform: translateY(14px) scale(0.86); transition: opacity .22s, transform .22s; }
+.fab-menu.show .fab-item:nth-child(1) { opacity:1;transform:none;transition-delay:.04s }
+.fab-menu.show .fab-item:nth-child(2) { opacity:1;transform:none;transition-delay:.09s }
+.fab-menu.show .fab-item:nth-child(3) { opacity:1;transform:none;transition-delay:.14s }
+.fab-menu.show .fab-item:nth-child(4) { opacity:1;transform:none;transition-delay:.19s }
 
-/* ── Remove old unused btn CSS ── */
 .btn-community,.btn-survival,.btn-reset { display: none; }
 
 /* NAV VIEW FULLSCREEN */
@@ -396,7 +394,7 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
       </svg>
       <div>
         <div style="font-size:11px;font-weight:400;color:#8a2408;letter-spacing:0.12em;line-height:1;margin-bottom:1px">AMBEX</div>
-        <div style="font-size:16px;font-weight:700;color:#F44019;letter-spacing:0.03em;line-height:1">TrailBack <span style="font-size:10px;font-weight:400;color:#8a2408">V0.5</span></div>
+        <div style="font-size:16px;font-weight:700;color:#F44019;letter-spacing:0.03em;line-height:1">TrailBack <span style="font-size:10px;font-weight:400;color:#8a2408">V0.7</span></div>
       </div>
     </div>
     <div class="gps-pill">
@@ -525,24 +523,8 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
 
     <!-- Buttons -->
     <div class="btn-section">
-      <div class="btn-row">
-        <button class="btn btn-pin" onclick="openPinModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2"/></svg>
-          ปักหมุดที่นี่
-        </button>
-        <button class="btn btn-return" id="returnBtn" onclick="startReturn()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-          นำทางกลับ
-        </button>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-stop btn-full" id="stopBtn" onclick="stopReturn()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-          หยุดนำทาง
-        </button>
-      </div>
       <!-- 2 ปุ่มหลัก -->
-      <div class="btn-row" style="margin-bottom:0">
+      <div class="btn-row">
         <button class="btn btn-pin" onclick="openPinModal()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2"/></svg>
           ปักหมุดที่นี่
@@ -553,9 +535,9 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
         </button>
       </div>
 
-      <!-- Stop + NavView (ซ่อนไว้ก่อน) -->
+      <!-- Stop + NavView (ซ่อนไว้จนกว่าจะเริ่มนำทาง) -->
       <div class="btn-row" style="display:none" id="navActionRow">
-        <button class="btn btn-stop" id="stopBtn" onclick="stopReturn()" style="display:flex;flex:1">
+        <button class="btn btn-stop" id="stopBtn" onclick="stopReturn()" style="flex:1">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
           หยุดนำทาง
         </button>
@@ -566,51 +548,49 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
       </div>
 
     </div><!-- end btn-section -->
+
+    <!-- FAB อยู่ใน panel ไม่ทับปุ่มอื่น -->
+    <div class="fab-wrap" id="fabWrap">
+      <div class="fab-menu" id="fabMenu">
+        <div class="fab-menu-label">เมนูลัด</div>
+        <div class="fab-grid">
+          <button class="fab-item" onclick="closeFab();openCommunity()">
+            <div class="fab-icon-wrap fab-purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="fab-label">ชุมชน</div>
+          </button>
+          <button class="fab-item" id="fabSosBtn" onclick="fabSOS()">
+            <div class="fab-icon-wrap fab-red" id="fabSosIcon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="fab-label" id="fabSosLabel">SOS</div>
+          </button>
+          <button class="fab-item" onclick="closeFab();openSurvival()">
+            <div class="fab-icon-wrap fab-amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="fab-label">คู่มือ</div>
+          </button>
+          <button class="fab-item" onclick="closeFab();openResetModal()">
+            <div class="fab-icon-wrap fab-gray">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </div>
+            <div class="fab-label">รีเซ็ท</div>
+          </button>
+        </div>
+      </div>
+      <button class="fab-btn" id="fabBtn" onclick="toggleFab()">
+        <svg class="fab-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg class="fab-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
   </div><!-- end panel -->
 </div><!-- end app -->
 
-<!-- FAB MENU OVERLAY -->
+<!-- FAB overlay backdrop -->
 <div class="fab-overlay" id="fabOverlay" onclick="closeFab()"></div>
-
-<!-- FAB QUICK ACTION -->
-<div class="fab-wrap" id="fabWrap">
-  <!-- Quick action grid (โผล่เมื่อกด FAB) -->
-  <div class="fab-menu" id="fabMenu">
-    <div class="fab-grid">
-      <button class="fab-item" onclick="closeFab();openCommunity()">
-        <div class="fab-icon-wrap fab-purple">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div class="fab-label">ชุมชน</div>
-      </button>
-      <button class="fab-item" id="fabSosBtn" onclick="closeFab();toggleSOS()">
-        <div class="fab-icon-wrap fab-red">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-        <div class="fab-label">SOS</div>
-      </button>
-      <button class="fab-item" onclick="closeFab();openSurvival()">
-        <div class="fab-icon-wrap fab-amber">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </div>
-        <div class="fab-label">คู่มือ</div>
-      </button>
-      <button class="fab-item" onclick="closeFab();openResetModal()">
-        <div class="fab-icon-wrap fab-gray">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        </div>
-        <div class="fab-label">รีเซ็ท</div>
-      </button>
-    </div>
-    <div class="fab-menu-label">เมนูลัด</div>
-  </div>
-
-  <!-- FAB main button -->
-  <button class="fab-btn" id="fabBtn" onclick="toggleFab()">
-    <svg class="fab-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    <svg class="fab-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-  </button>
-</div>
 
 <!-- NAV VIEW FULLSCREEN -->
 <div class="nav-view" id="navView">
@@ -1328,17 +1308,35 @@ function openFab() {
   fabOpen = true;
   document.getElementById('fabMenu').classList.add('show');
   document.getElementById('fabOverlay').classList.add('show');
-  document.getElementById('fabBtn').classList.add('open');
-  document.getElementById('fabBtn').querySelector('.fab-icon-open').style.display = 'none';
-  document.getElementById('fabBtn').querySelector('.fab-icon-close').style.display = '';
+  const btn = document.getElementById('fabBtn');
+  btn.classList.add('open');
+  btn.querySelector('.fab-icon-open').style.transform = 'rotate(45deg)';
 }
 function closeFab() {
   fabOpen = false;
   document.getElementById('fabMenu').classList.remove('show');
   document.getElementById('fabOverlay').classList.remove('show');
-  document.getElementById('fabBtn').classList.remove('open');
-  document.getElementById('fabBtn').querySelector('.fab-icon-open').style.display = '';
-  document.getElementById('fabBtn').querySelector('.fab-icon-close').style.display = 'none';
+  const btn = document.getElementById('fabBtn');
+  btn.classList.remove('open');
+  btn.querySelector('.fab-icon-open').style.transform = '';
+}
+function fabSOS() {
+  // ถ้า SOS กำลังทำงาน → หยุด แล้วปิด FAB
+  if (sosActive) {
+    stopSOS();
+    closeFab();
+    document.getElementById('fabSosIcon').style.background = 'linear-gradient(135deg,#dc2626,#f87171)';
+    document.getElementById('fabSosLabel').textContent = 'SOS';
+    return;
+  }
+  // เริ่ม SOS → ปิด FAB แล้ว start
+  closeFab();
+  setTimeout(() => {
+    startSOS();
+    // อัปเดต icon ใน FAB ให้รู้ว่า SOS กำลังทำงาน
+    document.getElementById('fabSosIcon').style.background = 'linear-gradient(135deg,#166534,#16a34a)';
+    document.getElementById('fabSosLabel').textContent = 'หยุด SOS';
+  }, 150);
 }
 function onGPSLost() {
   if (!drLastGoodPos) return;
@@ -1956,15 +1954,19 @@ function stopSOS() {
   sosTimers = [];
   flashOff();
   beepOff();
-  if (sosAudioCtx) {
-    sosAudioCtx.suspend();
-  }
+  if (sosAudioCtx) sosAudioCtx.suspend();
   document.getElementById('sosOverlay').classList.remove('show');
-  document.getElementById('sosBtn').classList.remove('active');
-  document.getElementById('sosBtn').innerHTML = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    🆘 SOS Flashlight
-  `;
+  // reset sosBtn ถ้ามี
+  const sosBtn = document.getElementById('sosBtn');
+  if (sosBtn) {
+    sosBtn.classList.remove('active');
+    sosBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 🆘 SOS Flashlight`;
+  }
+  // reset FAB SOS icon
+  const fabIcon = document.getElementById('fabSosIcon');
+  if (fabIcon) { fabIcon.style.background = 'linear-gradient(135deg,#dc2626,#f87171)'; }
+  const fabLbl = document.getElementById('fabSosLabel');
+  if (fabLbl) { fabLbl.textContent = 'SOS'; }
 }
 
 // ── COMMUNITY ─────────────────────────────────────────────────────
