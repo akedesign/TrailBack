@@ -178,6 +178,16 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
 
 /* toggle nav view button */
 .btn-navview { background: linear-gradient(135deg, #C8340F, #F44019); color: #fff; box-shadow: 0 4px 20px rgba(244,64,25,.35); }
+/* DEAD RECKONING BAR */
+.dr-bar { margin: 10px 14px 0; background: rgba(99,102,241,0.12); border: 0.5px solid rgba(99,102,241,0.4); border-radius: 12px; padding: 10px 14px; animation: drPulse 3s ease-in-out infinite; }
+@keyframes drPulse { 0%,100%{border-color:rgba(99,102,241,0.4)} 50%{border-color:rgba(99,102,241,0.8)} }
+.dr-inner { display: flex; align-items: center; gap: 10px; }
+.dr-icon { font-size: 20px; flex-shrink: 0; }
+.dr-text { flex: 1; min-width: 0; }
+.dr-title { font-size: 12px; font-weight: 600; color: #a5b4fc; }
+.dr-detail { font-size: 11px; color: #7070A0; margin-top: 2px; }
+.dr-badge { font-size: 13px; font-weight: 700; color: #a5b4fc; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
 /* SURVIVAL GUIDE MODAL */
 .survival-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 250; flex-direction: column; }
 .survival-ov.show { display: flex; }
@@ -340,6 +350,18 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
 
     <!-- Alert -->
     <div class="alert-bar" id="alertBar"></div>
+
+    <!-- Dead Reckoning Banner -->
+    <div class="dr-bar" id="drBar" style="display:none">
+      <div class="dr-inner">
+        <div class="dr-icon">📡</div>
+        <div class="dr-text">
+          <div class="dr-title">GPS หลุด — ใช้ Dead Reckoning</div>
+          <div class="dr-detail" id="drDetail">คำนวณจากเข็มทิศ + เวลาเดิน</div>
+        </div>
+        <div class="dr-badge" id="drBadge">~0ม.</div>
+      </div>
+    </div>
 
     <!-- Sunset Warning -->
     <div class="sunset-bar" id="sunsetBar">
@@ -689,6 +711,17 @@ let totalDistM = 0;
 let lastTrailPoint = null;
 let gpsWatchId = null;
 
+// Dead Reckoning state
+let drActive = false;          // กำลังใช้ DR อยู่ไหม
+let drPos = null;              // ตำแหน่งที่ DR คำนวณล่าสุด
+let drLastGoodPos = null;      // ตำแหน่ง GPS ล่าสุดที่ดี
+let drLastGoodTime = null;     // เวลาที่ GPS ดีล่าสุด
+let drHeadingAtLoss = 0;       // ทิศตอน GPS หลุด
+let drAvgSpeed = 1.2;          // ความเร็วเฉลี่ย เมตร/วินาที (เดินปกติ ~1.2 m/s)
+let drSpeedSamples = [];       // เก็บ sample ความเร็วจาก GPS จริง
+let drTotalEstM = 0;           // ระยะทางที่ DR ประมาณ
+let gpsLostTimer = null;       // timer ตรวจ GPS หลุด
+
 // ── CANVAS ────────────────────────────────────────────────────────
 const canvas = document.getElementById('trailCanvas');
 const ctx = canvas.getContext('2d');
@@ -862,49 +895,45 @@ function drawMap() {
     ctx.fillText(lbl, p.x, p.y + 13);
   });
 
-  // current position
+  // current position (GPS หรือ DR)
   if (currentPos) {
     const cp = project(currentPos, bn, W, H);
 
-    // accuracy ring
-    if (currentPos.acc && bn) {
-      const mpd = 111320;
-      const accPx = currentPos.acc / mpd / (bn.maxLat - bn.minLat || 1e-6) * (H - 56);
-      if (accPx > 0 && accPx < 200) {
-        ctx.beginPath();
-        ctx.arc(cp.x, cp.y, accPx, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(244,64,25,0.06)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(244,64,25,0.2)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+    // ถ้า DR mode — วาดแตกต่างออกไป
+    if (drActive) {
+      // outer uncertainty ring (ใหญ่กว่า บอกว่า estimated)
+      ctx.beginPath(); ctx.arc(cp.x, cp.y, 22, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(165,180,252,0.25)'; ctx.lineWidth = 2;
+      ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+      // dot สีม่วง
+      ctx.beginPath(); ctx.arc(cp.x, cp.y, 9, 0, Math.PI*2);
+      ctx.fillStyle = '#818cf8'; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+      // label "DR"
+      ctx.fillStyle = '#a5b4fc'; ctx.font = 'bold 9px Kanit,-apple-system,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText('DR', cp.x, cp.y - 12);
+    } else {
+      // GPS ปกติ
+      if (currentPos.acc && bn) {
+        const mpd = 111320;
+        const accPx = currentPos.acc / mpd / (bn.maxLat - bn.minLat || 1e-6) * (H - 56);
+        if (accPx > 0 && accPx < 200) {
+          ctx.beginPath(); ctx.arc(cp.x, cp.y, accPx, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(244,64,25,0.06)'; ctx.fill();
+          ctx.strokeStyle = 'rgba(244,64,25,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+        }
       }
+      const hRad = toRad(heading);
+      ctx.beginPath(); ctx.moveTo(cp.x, cp.y);
+      ctx.lineTo(cp.x + Math.sin(hRad)*24, cp.y - Math.cos(hRad)*24);
+      ctx.strokeStyle = 'rgba(244,64,25,0.5)'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cp.x, cp.y, 16, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(244,64,25,0.3)'; ctx.lineWidth = 3; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cp.x, cp.y, 9, 0, Math.PI*2);
+      ctx.fillStyle = '#F44019'; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
     }
-
-    // heading ray
-    const hRad = toRad(heading);
-    ctx.beginPath();
-    ctx.moveTo(cp.x, cp.y);
-    ctx.lineTo(cp.x + Math.sin(hRad)*24, cp.y - Math.cos(hRad)*24);
-    ctx.strokeStyle = 'rgba(244,64,25,0.5)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // pulse ring
-    ctx.beginPath();
-    ctx.arc(cp.x, cp.y, 16, 0, Math.PI*2);
-    ctx.strokeStyle = 'rgba(244,64,25,0.3)';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // dot
-    ctx.beginPath();
-    ctx.arc(cp.x, cp.y, 9, 0, Math.PI*2);
-    ctx.fillStyle = '#F44019';
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
   }
 
   // empty state
@@ -960,9 +989,42 @@ function onGPSSuccess(pos) {
     gpsReady = true;
     document.getElementById('gpsDot').className = 'gps-dot active';
     showToast('GPS พร้อม ✓ ±' + Math.round(acc) + 'ม.');
-    initSunsetWarning(); // เริ่ม sunset warning ทันทีที่รู้ตำแหน่ง
+    initSunsetWarning();
   }
   document.getElementById('gpsLabel').textContent = '±' + Math.round(acc) + 'ม.';
+
+  // ── Dead Reckoning: reset เมื่อ GPS กลับมา ──
+  if (drActive) {
+    drActive = false;
+    drPos = null;
+    drTotalEstM = 0;
+    document.getElementById('drBar').style.display = 'none';
+    showToast('GPS กลับมาแล้ว ✓');
+  }
+
+  // reset GPS lost timer ทุกครั้งที่ได้รับตำแหน่ง
+  clearTimeout(gpsLostTimer);
+  gpsLostTimer = setTimeout(onGPSLost, 8000); // GPS หายนาน 8 วิ = เริ่ม DR
+
+  // บันทึก speed sample จาก GPS จริง (ถ้า accuracy ดี)
+  if (acc < 30 && lastTrailPoint) {
+    const dt = 3; // watchPosition interval ~3s
+    const ds = haversine(lastTrailPoint, currentPos);
+    if (ds > 0.5 && ds < 20) {
+      const spd = ds / dt;
+      drSpeedSamples.push(spd);
+      if (drSpeedSamples.length > 20) drSpeedSamples.shift();
+      drAvgSpeed = drSpeedSamples.reduce((a,b)=>a+b,0) / drSpeedSamples.length;
+      drAvgSpeed = Math.max(0.5, Math.min(2.5, drAvgSpeed)); // clamp 0.5–2.5 m/s
+    }
+  }
+
+  // อัปเดต last good pos
+  if (acc < 50) {
+    drLastGoodPos = { lat: currentPos.lat, lon: currentPos.lon };
+    drLastGoodTime = Date.now();
+    drHeadingAtLoss = heading;
+  }
 
   // บันทึกเส้นทาง ทุก 5m
   if (!lastTrailPoint || haversine(lastTrailPoint, currentPos) > 5) {
@@ -996,6 +1058,55 @@ function onGPSError(err) {
   document.getElementById('gpsLabel').textContent = msgs[err.code] || 'GPS error';
   showAlert((msgs[err.code] || 'GPS error') + ' — กรุณาตรวจสอบการตั้งค่า Location', 'danger');
   pendingPinAfterGPS = false;
+}
+
+// ── DEAD RECKONING ────────────────────────────────────────────────
+function onGPSLost() {
+  if (!drLastGoodPos) return;
+  drActive = true;
+  drPos = { lat: drLastGoodPos.lat, lon: drLastGoodPos.lon };
+  drTotalEstM = 0;
+  document.getElementById('gpsDot').className = 'gps-dot error';
+  document.getElementById('gpsLabel').textContent = 'DR mode';
+  document.getElementById('drBar').style.display = 'block';
+  showToast('⚠️ GPS หลุด — เปิด Dead Reckoning', 'danger');
+  drUpdate();
+}
+
+let drInterval = null;
+function drUpdate() {
+  if (!drActive || !drPos) return;
+  const now = Date.now();
+  const elapsed = drLastGoodTime ? (now - drLastGoodTime) / 1000 : 0; // วินาที
+  const estDist = drAvgSpeed * elapsed; // เมตรที่คาดว่าเดินมา
+
+  // คำนวณตำแหน่งใหม่จากทิศเข็มทิศปัจจุบัน
+  const R = 6371000;
+  const hdgRad = heading * Math.PI / 180;
+  const dLat = (estDist * Math.cos(hdgRad)) / R;
+  const dLon = (estDist * Math.sin(hdgRad)) / (R * Math.cos(drLastGoodPos.lat * Math.PI / 180));
+
+  drPos = {
+    lat: drLastGoodPos.lat + dLat * 180 / Math.PI,
+    lon: drLastGoodPos.lon + dLon * 180 / Math.PI,
+    acc: estDist * 1.5 + 10 // accuracy เพิ่มขึ้นตามเวลา
+  };
+  drTotalEstM = estDist;
+
+  // อัปเดต currentPos ด้วย DR position
+  currentPos = drPos;
+
+  // อัปเดต DR bar
+  const mins = Math.floor(elapsed / 60);
+  const secs = Math.floor(elapsed % 60);
+  const timeStr = mins > 0 ? `${mins}น. ${secs}ว.` : `${secs} วินาที`;
+  const speedKmh = (drAvgSpeed * 3.6).toFixed(1);
+  document.getElementById('drDetail').textContent =
+    `ทิศ ${Math.round(heading)}° | เดินมา ${timeStr} | ${speedKmh} กม./ชม.`;
+  document.getElementById('drBadge').textContent = `~${Math.round(estDist)}ม.`;
+
+  updateNav();
+  drawMap();
 }
 
 // ── COMPASS ───────────────────────────────────────────────────────
@@ -1293,6 +1404,9 @@ document.getElementById('resetModal').addEventListener('click', function(e) {
 
 function confirmReset() {
   waypoints = []; trail = []; totalDistM = 0; lastTrailPoint = null;
+  drActive = false; drPos = null; drLastGoodPos = null; drTotalEstM = 0; drSpeedSamples = [];
+  clearTimeout(gpsLostTimer);
+  document.getElementById('drBar').style.display = 'none';
   localStorage.removeItem(SK);
   localStorage.removeItem(TK);
   closeResetModal();
@@ -1465,6 +1579,9 @@ resizeCanvas();
 renderWpList();
 startGPS();
 initCompass();
+
+// DR update loop ทุก 2 วินาที
+drInterval = setInterval(() => { if (drActive) drUpdate(); }, 2000);
 
 setInterval(() => {
   if (trail.length) localStorage.setItem(TK, JSON.stringify(trail.slice(-500)));
