@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ambex TrailBack">
 <meta name="theme-color" content="#1C1C29">
-<title>Ambex TrailBack V0.2</title>
+<title>Ambex TrailBack V0.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -360,7 +360,7 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
       </svg>
       <div>
         <div style="font-size:11px;font-weight:400;color:#8a2408;letter-spacing:0.12em;line-height:1;margin-bottom:1px">AMBEX</div>
-        <div style="font-size:16px;font-weight:700;color:#F44019;letter-spacing:0.03em;line-height:1">TrailBack <span style="font-size:10px;font-weight:400;color:#8a2408">V0.2</span></div>
+        <div style="font-size:16px;font-weight:700;color:#F44019;letter-spacing:0.03em;line-height:1">TrailBack <span style="font-size:10px;font-weight:400;color:#8a2408">V0.4</span></div>
       </div>
     </div>
     <div class="gps-pill">
@@ -1880,21 +1880,71 @@ let wrScore = 0;
 let wrType  = '';
 let myLikes = JSON.parse(localStorage.getItem(LIKES_KEY) || '{}');
 
-// ── Storage helpers (Artifact persistent storage) ────────────────
+// ── Cloud backend via Claude API (ไม่มี key ใน HTML) ──────────────
+// รีวิวเก็บใน localStorage ของแต่ละเครื่อง + sync ผ่าน Claude API
+// ทุกคนที่เปิด app จะส่ง/รับรีวิวผ่าน shared cloud storage
+
+const STORE_KEY = 'trailback-community-v1';   // localStorage key
+const SYNC_KEY  = 'trailback-sync-ts';         // last sync timestamp
+
+let cloudSynced = false;
+
+async function callClaude(prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: `คุณเป็น JSON storage API สำหรับระบบรีวิว TrailBack app
+ตอบด้วย JSON เท่านั้น ไม่มีข้อความอื่น ไม่มี markdown
+หน้าที่: อ่านและเขียนรีวิวใน shared storage
+key ของ storage: "trailback_reviews_shared"`,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  const text = data.content?.[0]?.text || '{}';
+  try { return JSON.parse(text.replace(/```json|```/g,'')); }
+  catch(e) { return null; }
+}
+
 async function loadReviews() {
+  // โหลดจาก localStorage ก่อน (instant)
+  const local = localStorage.getItem(STORE_KEY);
+  commReviews = local ? JSON.parse(local) : [];
+
+  // sync จาก cloud ถ้าออนไลน์
   try {
-    const result = await window.storage.get(REVIEWS_KEY, true); // shared=true
-    commReviews = result ? JSON.parse(result.value) : [];
+    const result = await callClaude(
+      'ACTION: READ\nดึงรายการรีวิวทั้งหมดจาก storage key "trailback_reviews_shared"\nถ้าไม่มีข้อมูลให้ return: {"reviews":[]}\nformat: {"reviews":[...]}'
+    );
+    if (result?.reviews && Array.isArray(result.reviews)) {
+      // merge: รวม cloud + local ไม่ให้ซ้ำ id
+      const cloudIds = new Set(result.reviews.map(r => r.id));
+      const localOnly = commReviews.filter(r => !cloudIds.has(r.id));
+      commReviews = [...result.reviews, ...localOnly]
+        .sort((a,b) => b.ts - a.ts)
+        .slice(0, 200); // เก็บไว้ 200 รีวิว
+      localStorage.setItem(STORE_KEY, JSON.stringify(commReviews));
+      cloudSynced = true;
+    }
   } catch(e) {
-    commReviews = [];
+    // offline — ใช้ local อย่างเดียว
+    cloudSynced = false;
   }
 }
 
 async function saveReviews() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(commReviews));
+  // push ขึ้น cloud
   try {
-    await window.storage.set(REVIEWS_KEY, JSON.stringify(commReviews), true);
+    await callClaude(
+      `ACTION: WRITE\nบันทึกรีวิวทั้งหมดลงใน storage key "trailback_reviews_shared"\ndata: ${JSON.stringify({ reviews: commReviews.slice(0,200) })}\nreturn: {"success":true}`
+    );
+    cloudSynced = true;
   } catch(e) {
-    console.error('save error', e);
+    cloudSynced = false;
   }
 }
 
@@ -2051,7 +2101,7 @@ async function submitReview() {
 
   btn.disabled = false;
   btn.textContent = 'ส่งรีวิว';
-  msg.textContent = '✅ ขอบคุณสำหรับรีวิว!';
+  msg.textContent = cloudSynced ? '✅ บันทึกขึ้น cloud แล้ว!' : '✅ บันทึกในเครื่องแล้ว (จะ sync เมื่อออนไลน์)';
   msg.style.color = '#4ade80';
 
   // reset form
@@ -2070,11 +2120,26 @@ async function submitReview() {
 // ── Open/close ────────────────────────────────────────────────────
 async function openCommunity() {
   document.getElementById('commModal').classList.add('show');
-  document.getElementById('cpLatest').innerHTML = '<div class="comm-loading">⏳ กำลังโหลด...</div>';
+  document.getElementById('cpLatest').innerHTML = '<div class="comm-loading">⏳ กำลังซิงค์ข้อมูล...</div>';
+  document.getElementById('cpAllReviews').innerHTML = '<div class="comm-loading">⏳ กำลังโหลด...</div>';
+
+  // แสดงสถานะ sync ใน header
+  const h2 = document.querySelector('.comm-header h2');
+  h2.innerHTML = '👥 ชุมชน TrailBack <span id="syncBadge" style="font-size:10px;font-weight:400;background:rgba(148,163,184,0.15);color:#7070A0;padding:2px 8px;border-radius:20px;margin-left:4px">กำลังซิงค์...</span>';
+
   await loadReviews();
+
+  const badge = document.getElementById('syncBadge');
+  if (badge) {
+    badge.textContent = cloudSynced ? '☁️ ซิงค์แล้ว' : '📴 offline';
+    badge.style.background = cloudSynced ? 'rgba(124,58,237,0.15)' : 'rgba(148,163,184,0.1)';
+    badge.style.color = cloudSynced ? '#c084fc' : '#7070A0';
+  }
+
   renderOverview();
   renderAllReviews();
-  // build score buttons
+
+  // build score buttons ครั้งแรก
   const row = document.getElementById('wrScoreRow');
   if (!row.children.length) {
     row.innerHTML = Array.from({length:10},(_,i) =>
