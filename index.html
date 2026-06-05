@@ -15,7 +15,7 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; background: #1C1C29; font-family: 'Kanit', -apple-system, 'Helvetica Neue', sans-serif; font-weight: 300; color: #e8f5e9; overflow: hidden; }
-.app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
+.app { display: flex; flex-direction: column; height: 100dvh; height: calc(var(--app-height, 100vh)); max-width: 480px; margin: 0 auto; position: relative; }
 
 /* HEADER */
 .header { background: #1E1E2E; padding: env(safe-area-inset-top, 12px) 16px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid #2A2A3D; flex-shrink: 0; }
@@ -47,7 +47,16 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Kanit', -apple-sys
 .scale-label { font-size: 10px; color: #7070A0; font-variant-numeric: tabular-nums; }
 
 /* PANEL */
-.panel { background: #191924; border-top: 0.5px solid #2A2A3D; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: 56vh; padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 8px); }
+.panel {
+  background: #191924;
+  border-top: 0.5px solid #2A2A3D;
+  flex-shrink: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 52vh;
+  max-height: calc(var(--panel-max, 52vh));
+  padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 12px);
+}
 
 /* NAV CARD */
 .nav-card { display: none; margin: 12px 14px 0; background: #1E1E2E; border: 1px solid #c43315; border-radius: 14px; padding: 12px 14px; }
@@ -1788,6 +1797,21 @@ document.addEventListener('touchmove', e => {
   const allowed = e.target.closest('.panel, .sv-content, .sv-tabs, .survival-sheet, .share-sheet');
   if (!allowed) e.preventDefault();
 }, { passive: false });
+
+// ── PWA STANDALONE HEIGHT FIX (iOS Safari Add to Home Screen) ────
+function fixAppHeight() {
+  const h = window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', h + 'px');
+  // panel = ขนาดที่เหลือหลัง header (~60px) และ map (~45% ของ h)
+  const headerH = document.querySelector('.header')
+    ? document.querySelector('.header').offsetHeight : 60;
+  const mapH = Math.round(h * 0.44);
+  const panelMax = h - headerH - mapH;
+  document.documentElement.style.setProperty('--panel-max', Math.max(panelMax, 260) + 'px');
+}
+fixAppHeight();
+window.addEventListener('resize', fixAppHeight);
+window.addEventListener('orientationchange', () => setTimeout(fixAppHeight, 300));
 
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
