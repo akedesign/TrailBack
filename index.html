@@ -635,19 +635,22 @@ function scalebar(bn,W,H){
 }
 
 // ── GPS ────────────────────────────────────────────────────────────
-function initGPS(){
+let gpsReady=false, gpsWatchId=null;
+
+function startGPS(){
+  if(gpsWatchId!==null)return; // already watching
   if(!navigator.geolocation){
     document.getElementById('gpsDot').className='hud-gps-dot err';
     document.getElementById('gpsVal').textContent='ไม่รองรับ GPS';
     return;
   }
-  navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,timeout:15000,maximumAge:3000});
+  document.getElementById('gpsVal').textContent='กำลังหา…';
+  gpsWatchId=navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,timeout:20000,maximumAge:3000});
 }
-let gpsReady=false;
 function onPos(p){
   const la=p.coords.latitude,lo=p.coords.longitude,ac=p.coords.accuracy;
   pos={lat:la,lon:lo,acc:ac};
-  if(!gpsReady){gpsReady=true;toast('GPS พร้อม ±'+Math.round(ac)+'ม.');}
+  if(!gpsReady){gpsReady=true;toast('GPS พร้อม ±'+Math.round(ac)+'ม. ✓');}
   document.getElementById('gpsDot').className='hud-gps-dot ok';
   document.getElementById('gpsVal').textContent='±'+Math.round(ac)+'ม.';
   document.getElementById('sAcc').innerHTML=Math.round(ac)+'<span class="sunit"> ม.</span>';
@@ -657,32 +660,28 @@ function onPos(p){
     lastPt={lat:la,lon:lo};
     if(trail.length%10===0)localStorage.setItem(TK,JSON.stringify(trail.slice(-600)));
   }
-  if(p.coords.heading!==null&&!hdgLocked){hdg=p.coords.heading;updateCompass();}
+  if(p.coords.heading!==null&&p.coords.heading!==undefined&&!hdgLocked){
+    hdg=p.coords.heading;updateCompass();
+  }
   const fd=fmt(totalM);
   document.getElementById('sDist').innerHTML=fd.v+'<span class="sunit"> '+fd.u+'</span>';
   document.getElementById('hudDist').textContent=fd.v+' '+fd.u;
+  // ── ถ้ามี callback รอ GPS อยู่ ให้เรียกทันที ──
+  if(pendingPinAfterGPS&&pos){pendingPinAfterGPS=false;doOpenModal();}
   updateNav();draw();
 }
 function onErr(e){
   document.getElementById('gpsDot').className='hud-gps-dot err';
-  const m={1:'ไม่ได้รับสิทธิ์',2:'ไม่พบสัญญาณ',3:'Timeout'};
+  const m={1:'ไม่ได้รับสิทธิ์ Location',2:'ไม่พบสัญญาณ GPS',3:'GPS หมดเวลา'};
   document.getElementById('gpsVal').textContent=m[e.code]||'GPS error';
-  alert2((m[e.code]||'GPS error')+' — ตรวจสอบการตั้งค่า Location','danger');
+  alert2((m[e.code]||'GPS error')+' — กรุณาตรวจสอบการตั้งค่า Location ในมือถือ','danger');
+  pendingPinAfterGPS=false;
 }
 
 // ── COMPASS ────────────────────────────────────────────────────────
 function updateCompass(){
   document.getElementById('compassNeedle').setAttribute('transform',`rotate(${-hdg} 31 31)`);
   document.getElementById('hudHead').textContent=Math.round(hdg)+'°';
-  document.getElementById('headingVal')&&(document.getElementById('headingVal').innerHTML=Math.round(hdg)+'<span class="sunit"> °</span>');
-}
-function reqPerm(){
-  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
-    DeviceOrientationEvent.requestPermission().then(r=>{
-      if(r==='granted'){document.getElementById('permBtn').style.display='none';bindOri();toast('เปิดเข็มทิศแล้ว ✓');}
-      else toast('ไม่ได้รับสิทธิ์เข็มทิศ','danger');
-    }).catch(console.error);
-  }
 }
 function bindOri(){
   window.addEventListener('deviceorientationabsolute',handleOri,true);
@@ -692,19 +691,30 @@ function handleOri(e){
   let h;
   if(e.webkitCompassHeading!=null&&e.webkitCompassHeading!==0)h=e.webkitCompassHeading;
   else if(e.absolute&&e.alpha!=null)h=(360-e.alpha)%360;
-  else if(e.alpha!=null)h=(360-e.alpha)%360;
-  if(h!=null){hdg=h;hdgLocked=true;updateCompass();draw();}
+  else if(!e.absolute&&e.alpha!=null)h=(360-e.alpha)%360;
+  if(h!=null&&!isNaN(h)){hdg=h;hdgLocked=true;updateCompass();draw();}
+}
+function reqCompassPerm(){
+  // เรียกตอนมี user gesture เท่านั้น (iOS requirement)
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+    return DeviceOrientationEvent.requestPermission().then(r=>{
+      if(r==='granted'){document.getElementById('permBtn').style.display='none';bindOri();}
+      return r;
+    }).catch(()=>'denied');
+  }
+  return Promise.resolve('granted'); // Android/desktop ไม่ต้องขอ
 }
 function initCompass(){
   if(typeof DeviceOrientationEvent==='undefined')return;
   if(typeof DeviceOrientationEvent.requestPermission==='function'){
-    // iOS 13+ — show tap-to-enable button (can't auto-request without gesture)
+    // iOS — แสดงปุ่มให้กดเอง (กดแล้ว bindOri ทันที)
     document.getElementById('permBtn').style.display='block';
   } else {
-    // Android + desktop — bind directly, no permission needed
+    // Android + desktop — bind เลย
     bindOri();
   }
 }
+function reqPerm(){reqCompassPerm().then(()=>toast('เข็มทิศพร้อมแล้ว ✓'));}
 function openResetModal(){document.getElementById('resetModal').classList.add('show');}
 function closeResetModal(){document.getElementById('resetModal').classList.remove('show');}
 function confirmReset(){
@@ -741,7 +751,7 @@ function updateNav(){
 }
 function startReturn(){
   if(!wps.length){toast('ยังไม่มี waypoints!','danger');return;}
-  if(!pos){toast('รอ GPS ก่อน','danger');return;}
+  if(!pos){startGPS();toast('กำลังขอตำแหน่ง GPS…');return;}
   nav=true;tgt=wps.length-1;startDist=null;
   document.getElementById('navCard').style.display='block';
   document.getElementById('stopBtn').style.display='flex';
@@ -762,8 +772,24 @@ function stopReturn(){
 }
 
 // ── WAYPOINTS ──────────────────────────────────────────────────────
+let pendingPinAfterGPS=false;
+
 function openModal(){
-  if(!pos){toast('รอ GPS ก่อน','danger');return;}
+  // ถ้า GPS ยังไม่พร้อม → ขอ permission + รอตำแหน่งแล้วเปิด modal อัตโนมัติ
+  if(!pos){
+    pendingPinAfterGPS=true;
+    startGPS();
+    // iOS: ขอ compass permission ไปด้วยตอนมี gesture นี้
+    reqCompassPerm();
+    toast('กำลังขอตำแหน่ง GPS…');
+    return;
+  }
+  // iOS: ขอ compass permission ด้วยทุกครั้งที่มี user gesture (ถ้ายังไม่ได้ขอ)
+  reqCompassPerm();
+  doOpenModal();
+}
+function doOpenModal(){
+  if(!pos)return;
   document.getElementById('pinName').value='WP'+(wps.length+1);
   document.getElementById('pinCoord').textContent=fc(pos.lat,pos.lon);
   document.getElementById('pinModal').classList.add('show');
@@ -789,7 +815,7 @@ function deleteWp(i){
   if(nav)stopReturn();renderWps();draw();
 }
 function navToWp(i){
-  if(!pos){toast('รอ GPS ก่อน','danger');return;}
+  if(!pos){startGPS();toast('กำลังขอตำแหน่ง GPS…');return;}
   nav=true;tgt=i;startDist=null;
   document.getElementById('navCard').style.display='block';
   document.getElementById('stopBtn').style.display='flex';
@@ -830,7 +856,7 @@ function renderWps(){
 // ── INIT ───────────────────────────────────────────────────────────
 document.addEventListener('touchmove',e=>{if(!e.target.closest('.sheet'))e.preventDefault();},{passive:false});
 window.addEventListener('resize',resize);
-resize(); renderWps(); initGPS(); initCompass();
+resize(); renderWps(); startGPS(); initCompass();
 setInterval(()=>{if(trail.length)localStorage.setItem(TK,JSON.stringify(trail.slice(-600)));},30000);
 setInterval(()=>{if(pos)draw();},2000);
 </script>
