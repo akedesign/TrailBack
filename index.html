@@ -115,7 +115,6 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Kanit', -apple-sys
 .btn-stop { display: none; background: #1E1E2E; color: #f87171; border: 0.5px solid #7f1d1d; }
 .btn-reset { background: #1E1E2E; color: #7070A0; border: 0.5px solid #2A2A3D; }
 .btn-survival { background: #1E1E2E; color: #EF9F27; border: 0.5px solid rgba(186,117,23,0.4); }
-.btn-share { background: linear-gradient(135deg,#0ea5e9,#6366f1); color: #fff; box-shadow: 0 4px 20px rgba(14,165,233,.3); }
 .btn-full { grid-column: 1 / -1; }
 
 /* force Kanit on ALL button/input elements */
@@ -200,44 +199,7 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
 .dr-badge { font-size: 13px; font-weight: 700; color: #a5b4fc; flex-shrink: 0; font-variant-numeric: tabular-nums; }
 
 /* SURVIVAL GUIDE MODAL */
-/* SHARE MODAL */
-.share-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 260; align-items: flex-end; justify-content: center; padding-bottom: env(safe-area-inset-bottom,16px); }
-.share-ov.show { display: flex; }
-.share-sheet { background: #1C1C29; border: 0.5px solid rgba(255,255,255,0.1); border-radius: 20px 20px 16px 16px; width: 100%; max-width: 480px; padding: 20px; }
-.share-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.12); border-radius: 2px; margin: 0 auto 16px; }
-.share-title { font-size: 16px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-.share-sub { font-size: 12px; color: #7070A0; margin-bottom: 16px; line-height: 1.5; }
 
-/* info preview card */
-.share-preview { background: #14142A; border: 0.5px solid #2A2A3D; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
-.sp-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-.sp-row:last-child { margin-bottom: 0; }
-.sp-label { font-size: 11px; color: #7070A0; }
-.sp-val { font-size: 12px; color: #e8f5e9; text-align: right; max-width: 60%; word-break: break-all; }
-
-/* deadline picker */
-.share-deadline { margin-bottom: 14px; }
-.sdl-label { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
-.sdl-opts { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
-.sdl-opt { background: #1E1E2E; border: 0.5px solid #2A2A3D; border-radius: 10px; padding: 8px 4px; font-size: 12px; color: #7070A0; text-align: center; cursor: pointer; font-family: 'Kanit', sans-serif; font-weight: 300; transition: all .15s; }
-.sdl-opt.active { background: rgba(14,165,233,0.15); border-color: rgba(14,165,233,0.5); color: #38bdf8; }
-
-/* emergency contact */
-.share-contact { margin-bottom: 16px; }
-.sc-label { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
-.sc-input { width: 100%; background: #14142A; border: 0.5px solid #2A2A3D; border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #e8f5e9; outline: none; font-family: 'Kanit', sans-serif; font-weight: 300; }
-.sc-input:focus { border-color: rgba(14,165,233,0.5); }
-
-/* action buttons */
-.share-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.sa-btn { border: none; border-radius: 12px; padding: 13px 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Kanit', sans-serif; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.sa-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
-.sa-cancel { background: #2A2A3D; color: #7070A0; }
-.sa-share { background: linear-gradient(135deg,#0ea5e9,#6366f1); color: #fff; grid-column: 1/-1; }
-.sa-copy { background: rgba(14,165,233,0.1); color: #38bdf8; border: 0.5px solid rgba(14,165,233,0.3); }
-
-/* copy success flash */
-.copy-flash { font-size: 11px; color: #4ade80; text-align: center; margin-top: 8px; display: none; }
 
 .survival-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 250; flex-direction: column; }
 .survival-ov.show { display: flex; }
@@ -450,12 +412,6 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
         </button>
       </div>
       <div class="btn-row">
-        <button class="btn btn-share btn-full" onclick="openShareModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          แชร์ตำแหน่งก่อนเดินทาง
-        </button>
-      </div>
-      <div class="btn-row">
         <button class="btn btn-stop btn-full" id="stopBtn" onclick="stopReturn()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
           หยุดนำทาง
@@ -551,65 +507,6 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
       หยุดนำทาง
     </button>
-  </div>
-</div>
-
-<!-- SHARE LOCATION MODAL -->
-<div class="share-ov" id="shareModal">
-  <div class="share-sheet">
-    <div class="share-handle"></div>
-    <div class="share-title">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      แชร์ตำแหน่งก่อนเดินทาง
-    </div>
-    <div class="share-sub">ส่งข้อมูลนี้ให้คนที่บ้านก่อนเข้าป่า<br>ถ้าคุณไม่กลับภายในเวลาที่กำหนด ให้แจ้ง Rescue</div>
-
-    <div class="share-preview">
-      <div class="sp-row">
-        <div class="sp-label">📍 จุดเริ่มต้น</div>
-        <div class="sp-val" id="spStartCoord">รอ GPS...</div>
-      </div>
-      <div class="sp-row">
-        <div class="sp-label">🗺️ Waypoints</div>
-        <div class="sp-val" id="spWpCount">0 จุด</div>
-      </div>
-      <div class="sp-row">
-        <div class="sp-label">🕐 เวลาออกเดินทาง</div>
-        <div class="sp-val" id="spDepartTime">—</div>
-      </div>
-      <div class="sp-row">
-        <div class="sp-label">⏰ กลับก่อน</div>
-        <div class="sp-val" id="spDeadlineTime">—</div>
-      </div>
-    </div>
-
-    <div class="share-deadline">
-      <div class="sdl-label">คาดว่าจะกลับภายใน</div>
-      <div class="sdl-opts">
-        <div class="sdl-opt" onclick="setDeadline(2)">2 ชม.</div>
-        <div class="sdl-opt active" onclick="setDeadline(4)">4 ชม.</div>
-        <div class="sdl-opt" onclick="setDeadline(8)">8 ชม.</div>
-        <div class="sdl-opt" onclick="setDeadline(24)">1 วัน</div>
-      </div>
-    </div>
-
-    <div class="share-contact">
-      <div class="sc-label">เบอร์ผู้ติดต่อฉุกเฉิน (ไม่บังคับ)</div>
-      <input class="sc-input" id="emergencyContact" type="tel" placeholder="เช่น 081-234-5678">
-    </div>
-
-    <div class="share-actions">
-      <button class="sa-btn sa-cancel" onclick="closeShareModal()">ยกเลิก</button>
-      <button class="sa-btn sa-copy" onclick="copyShareText()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        คัดลอก
-      </button>
-      <button class="sa-btn sa-share" onclick="doShare()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        ส่งผ่าน Line / SMS
-      </button>
-    </div>
-    <div class="copy-flash" id="copyFlash">✅ คัดลอกแล้ว!</div>
   </div>
 </div>
 
@@ -1665,118 +1562,6 @@ function initSunsetWarning() {
   sunsetInterval = setInterval(updateSunsetWarning, 1000);
   updateSunsetWarning();
 }
-
-// ── SHARE LOCATION ────────────────────────────────────────────────
-let shareDeadlineHours = 4;
-
-function setDeadline(h) {
-  shareDeadlineHours = h;
-  document.querySelectorAll('.sdl-opt').forEach(el => {
-    el.classList.toggle('active', el.textContent.includes(h === 24 ? '1 วัน' : h + ' ชม.'));
-  });
-  updateSharePreview();
-}
-
-function buildShareText() {
-  const now = new Date();
-  const deadline = new Date(now.getTime() + shareDeadlineHours * 3600000);
-  const fmtDT = d => d.toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
-  const contact = document.getElementById('emergencyContact').value.trim();
-
-  let coordStr = currentPos
-    ? `${currentPos.lat.toFixed(5)}, ${currentPos.lon.toFixed(5)}`
-    : 'ไม่ทราบตำแหน่ง';
-
-  let mapsLink = currentPos
-    ? `https://maps.google.com/?q=${currentPos.lat.toFixed(5)},${currentPos.lon.toFixed(5)}`
-    : '';
-
-  let wpLines = '';
-  if (waypoints.length > 0) {
-    wpLines = '\n\n📌 Waypoints ที่วางแผนไว้:\n';
-    waypoints.forEach((wp, i) => {
-      wpLines += `  WP${i+1} ${wp.label}: ${wp.lat.toFixed(5)}, ${wp.lon.toFixed(5)}\n`;
-    });
-  }
-
-  let text = `🏕️ แจ้งแผนการเดินป่า — Ambex TrailBack\n`;
-  text += `━━━━━━━━━━━━━━━━━━\n`;
-  text += `📍 จุดเริ่มต้น: ${coordStr}\n`;
-  if (mapsLink) text += `🗺️ Google Maps: ${mapsLink}\n`;
-  text += `🕐 ออกเดินทาง: ${fmtDT(now)}\n`;
-  text += `⏰ กลับก่อน: ${fmtDT(deadline)}\n`;
-  if (contact) text += `📞 ผู้ติดต่อฉุกเฉิน: ${contact}\n`;
-  text += wpLines;
-  text += `\n━━━━━━━━━━━━━━━━━━\n`;
-  text += `⚠️ ถ้าไม่กลับภายใน ${fmtDT(deadline)}\nกรุณาแจ้ง: สายด่วนกู้ภัย 1669`;
-  return text;
-}
-
-function updateSharePreview() {
-  const now = new Date();
-  const deadline = new Date(now.getTime() + shareDeadlineHours * 3600000);
-  const fmtT = d => d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-  const fmtDT = d => d.toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
-
-  document.getElementById('spStartCoord').textContent = currentPos
-    ? `${currentPos.lat.toFixed(4)}, ${currentPos.lon.toFixed(4)}`
-    : 'รอ GPS...';
-  document.getElementById('spWpCount').textContent = `${waypoints.length} จุด`;
-  document.getElementById('spDepartTime').textContent = fmtDT(now);
-  document.getElementById('spDeadlineTime').textContent = fmtDT(deadline);
-}
-
-function openShareModal() {
-  updateSharePreview();
-  document.getElementById('shareModal').classList.add('show');
-}
-
-function closeShareModal() {
-  document.getElementById('shareModal').classList.remove('show');
-}
-
-async function doShare() {
-  const text = buildShareText();
-  if (navigator.share) {
-    try {
-      await navigator.share({ title: 'Ambex TrailBack — แผนการเดินป่า', text });
-      closeShareModal();
-    } catch (e) {
-      if (e.name !== 'AbortError') copyFallback(text);
-    }
-  } else {
-    copyFallback(text);
-  }
-}
-
-function copyFallback(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    showCopyFlash();
-  }).catch(() => {
-    // fallback สุดท้าย
-    const ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    showCopyFlash();
-  });
-}
-
-function copyShareText() {
-  copyFallback(buildShareText());
-}
-
-function showCopyFlash() {
-  const el = document.getElementById('copyFlash');
-  el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 2500);
-}
-
-document.getElementById('shareModal').addEventListener('click', function(e) {
-  if (e.target === this) closeShareModal();
-});
-document.getElementById('emergencyContact').addEventListener('input', updateSharePreview);
 
 // ── SURVIVAL GUIDE ────────────────────────────────────────────────
 function openSurvival() {
