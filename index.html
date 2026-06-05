@@ -27,6 +27,26 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
 .gps-dot.error { background: #ef4444; animation: none; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 .gps-text { font-size: 11px; color: #7070A0; white-space: nowrap; }
+.clock-pill { display: flex; align-items: center; background: #14142A; border: 0.5px solid #2A2A3D; border-radius: 20px; padding: 4px 10px; }
+.clock-pill span { font-size: 13px; font-weight: 600; color: #e8f5e9; font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
+
+/* SUNSET POPUP MODAL */
+.sunset-popup-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; align-items: flex-end; justify-content: center; padding-bottom: env(safe-area-inset-bottom, 20px); }
+.sunset-popup-ov.show { display: flex; }
+.sunset-popup { background: #1E1E2E; border: 0.5px solid rgba(255,255,255,0.12); border-radius: 20px 20px 16px 16px; padding: 24px 20px 20px; width: 100%; max-width: 480px; text-align: center; }
+.sp-icon { font-size: 52px; line-height: 1; margin-bottom: 12px; }
+.sp-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.sp-title.warning { color: #EF9F27; }
+.sp-title.critical { color: #f87171; }
+.sp-body { font-size: 14px; color: #7070A0; line-height: 1.7; margin-bottom: 20px; }
+.sp-time-big { font-size: 36px; font-weight: 700; margin: 10px 0; font-variant-numeric: tabular-nums; }
+.sp-time-big.warning { color: #EF9F27; }
+.sp-time-big.critical { color: #f87171; }
+.sp-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sp-btn-dismiss { border: none; border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 600; cursor: pointer; background: #2A2A3D; color: #7070A0; font-family: 'Anuphan', sans-serif; }
+.sp-btn-ok { border: none; border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 600; cursor: pointer; color: #fff; font-family: 'Anuphan', sans-serif; }
+.sp-btn-ok.warning { background: #BA7517; }
+.sp-btn-ok.critical { background: #dc2626; }
 
 /* MAP */
 .map-wrap { position: relative; flex: 1 1 auto; min-height: 0; background: #16161F; overflow: hidden; }
@@ -173,6 +193,9 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
     <div class="gps-pill">
       <div class="gps-dot" id="gpsDot"></div>
       <span class="gps-text" id="gpsLabel">รอ GPS...</span>
+    </div>
+    <div class="clock-pill">
+      <span id="clockDisplay">--:--</span>
     </div>
   </div>
 
@@ -322,7 +345,19 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
   </div>
 </div>
 
-<!-- RESET MODAL -->
+<!-- SUNSET POPUP MODAL -->
+<div class="sunset-popup-ov" id="sunsetPopup">
+  <div class="sunset-popup">
+    <div class="sp-icon" id="spIcon">🌇</div>
+    <div class="sp-title" id="spTitle">เหลือเวลาน้อยแล้ว!</div>
+    <div class="sp-time-big" id="spTimeBig">18:30</div>
+    <div class="sp-body" id="spBody">พระอาทิตย์กำลังจะตก กรุณาเริ่มหาที่พักหรือเร่งเดินทางกลับโดยทันที</div>
+    <div class="sp-actions">
+      <button class="sp-btn-dismiss" onclick="dismissSunsetPopup()">รับทราบ</button>
+      <button class="sp-btn-ok warning" id="spBtnOk" onclick="dismissSunsetPopup()">เริ่มนำทางกลับ</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="resetModal">
   <div class="reset-modal">
     <div class="reset-icon">
@@ -905,8 +940,17 @@ function confirmReset() {
   showToast('รีเซ็ทเรียบร้อย ✓');
 }
 
+// ── REAL-TIME CLOCK ───────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('clockDisplay').textContent = h + ':' + m;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
 // ── SUNSET WARNING ────────────────────────────────────────────────
-// SunCalc — คำนวณเวลาพระอาทิตย์ตกจากพิกัด (offline 100%)
 function calcSunset(lat, lon) {
   const now = new Date();
   const JD = now / 86400000 + 2440587.5;
@@ -920,97 +964,181 @@ function calcSunset(lat, lon) {
   const sinD = Math.sin(lam * Math.PI/180) * Math.sin(23.4393 * Math.PI/180);
   const cosD = Math.cos(Math.asin(sinD));
   const cosH = (Math.sin(-0.8333 * Math.PI/180) - Math.sin(lat * Math.PI/180) * sinD) / (Math.cos(lat * Math.PI/180) * cosD);
-  if (cosH > 1 || cosH < -1) return null; // midnight sun or polar night
+  if (cosH > 1 || cosH < -1) return null;
   const H = Math.acos(cosH) * 180 / Math.PI;
   const Jset = Jtransit + H / 360;
-  const sunset = new Date((Jset - 2440587.5) * 86400000);
-  return sunset;
+  return new Date((Jset - 2440587.5) * 86400000);
 }
 
 function fmtTime(date) {
   return date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-function fmtMinutes(mins) {
+function fmtCountdown(secsLeft) {
+  if (secsLeft <= 0) return '00:00';
+  const h = Math.floor(secsLeft / 3600);
+  const m = Math.floor((secsLeft % 3600) / 60);
+  const s = secsLeft % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function fmtMinsText(mins) {
   if (mins >= 60) {
-    const h = Math.floor(mins / 60);
-    const m = mins % 60;
-    return m > 0 ? `${h}ชม. ${m}น.` : `${h} ชม.`;
+    const h = Math.floor(mins / 60), m = mins % 60;
+    return m > 0 ? `${h} ชม. ${m} น.` : `${h} ชม.`;
   }
   return `${mins} น.`;
 }
 
 let sunsetTime = null;
 let sunsetInterval = null;
+// popup แสดงแต่ละ threshold ครั้งเดียวต่อวัน
+let popupShown = { 120: false, 60: false, 30: false, 0: false };
+
+function showSunsetPopup(level) {
+  if (popupShown[level]) return;
+  popupShown[level] = true;
+
+  const ov     = document.getElementById('sunsetPopup');
+  const icon   = document.getElementById('spIcon');
+  const title  = document.getElementById('spTitle');
+  const timeBig = document.getElementById('spTimeBig');
+  const body   = document.getElementById('spBody');
+  const btnOk  = document.getElementById('spBtnOk');
+
+  timeBig.textContent = fmtTime(sunsetTime);
+
+  if (level === 0) {
+    icon.textContent = '🌑';
+    title.textContent = 'มืดแล้ว! หยุดเดินทันที';
+    title.className = 'sp-title critical';
+    timeBig.className = 'sp-time-big critical';
+    body.textContent = 'พระอาทิตย์ตกแล้ว การเดินในป่าตอนกลางคืนเป็นอันตรายมาก กรุณาหยุดอยู่กับที่และรอรุ่งเช้า';
+    btnOk.className = 'sp-btn-ok critical';
+    btnOk.textContent = 'หยุดเดิน รับทราบ';
+  } else if (level === 30) {
+    icon.textContent = '🌇';
+    title.textContent = 'เหลือ 30 นาทีก่อนมืด!';
+    title.className = 'sp-title critical';
+    timeBig.className = 'sp-time-big critical';
+    body.textContent = 'นี่คือสัญญาณสุดท้าย! หาที่พักหรือเร่งกลับโดยทันที อย่ารอให้มืดสนิท';
+    btnOk.className = 'sp-btn-ok critical';
+    btnOk.textContent = 'เข้าใจแล้ว เร่งกลับ';
+  } else if (level === 60) {
+    icon.textContent = '🌆';
+    title.textContent = 'เหลือ 1 ชั่วโมงก่อนมืด';
+    title.className = 'sp-title warning';
+    timeBig.className = 'sp-time-big warning';
+    body.textContent = 'ได้เวลาเริ่มหาที่พักหรือวางแผนเดินทางกลับแล้ว อย่าประมาทเรื่องเวลา';
+    btnOk.className = 'sp-btn-ok warning';
+    btnOk.textContent = 'เริ่มนำทางกลับ';
+  } else {
+    icon.textContent = '🌤';
+    title.textContent = 'แจ้งเตือน: เหลือ 2 ชั่วโมง';
+    title.className = 'sp-title warning';
+    timeBig.className = 'sp-time-big warning';
+    body.textContent = `พระอาทิตย์จะตก ${fmtTime(sunsetTime)} วางแผนเส้นทางกลับได้เลย`;
+    btnOk.className = 'sp-btn-ok warning';
+    btnOk.textContent = 'รับทราบ';
+  }
+
+  ov.classList.add('show');
+}
+
+function dismissSunsetPopup() {
+  document.getElementById('sunsetPopup').classList.remove('show');
+}
+document.getElementById('sunsetPopup').addEventListener('click', function(e) {
+  if (e.target === this) dismissSunsetPopup();
+});
 
 function updateSunsetWarning() {
   if (!currentPos) return;
-  const bar = document.getElementById('sunsetBar');
-  const title = document.getElementById('sunsetTitle');
-  const detail = document.getElementById('sunsetDetail');
-  const countdown = document.getElementById('sunsetCountdown');
-  const icon = document.getElementById('sunsetIcon');
-  const progress = document.getElementById('sunsetProgress');
 
   sunsetTime = calcSunset(currentPos.lat, currentPos.lon);
   if (!sunsetTime) {
-    bar.style.display = 'none';
+    document.getElementById('sunsetBar').style.display = 'none';
     return;
   }
 
   const now = new Date();
-  const minsLeft = Math.round((sunsetTime - now) / 60000);
+  const secsLeft = Math.round((sunsetTime - now) / 1000);
+  const minsLeft = Math.floor(secsLeft / 60);
+
+  const bar      = document.getElementById('sunsetBar');
+  const title    = document.getElementById('sunsetTitle');
+  const detail   = document.getElementById('sunsetDetail');
+  const countdown = document.getElementById('sunsetCountdown');
+  const icon     = document.getElementById('sunsetIcon');
+  const progress = document.getElementById('sunsetProgress');
 
   bar.style.display = 'block';
   bar.className = 'sunset-bar';
 
-  if (minsLeft < 0) {
-    // หลังพระอาทิตย์ตกแล้ว
+  // ── trigger popups ──
+  if (minsLeft < 0 && !popupShown[0])          showSunsetPopup(0);
+  else if (minsLeft <= 30 && !popupShown[30])   showSunsetPopup(30);
+  else if (minsLeft <= 60 && !popupShown[60])   showSunsetPopup(60);
+  else if (minsLeft <= 120 && !popupShown[120]) showSunsetPopup(120);
+
+  // ── update bar ──
+  if (secsLeft < 0) {
     bar.classList.add('critical');
     icon.textContent = '🌑';
     title.textContent = 'มืดแล้ว! หยุดเดินทันที';
     detail.textContent = `พระอาทิตย์ตก ${fmtTime(sunsetTime)} — อย่าเดินในที่มืดโดยเด็ดขาด`;
     countdown.textContent = fmtTime(sunsetTime);
     progress.style.width = '100%';
+
   } else if (minsLeft <= 30) {
-    // เหลือ ≤ 30 นาที — วิกฤต
     bar.classList.add('critical');
     icon.textContent = '🌇';
-    title.textContent = `เหลือเวลาน้อยมาก! หาที่พักเดี๋ยวนี้`;
-    detail.textContent = `พระอาทิตย์ตก ${fmtTime(sunsetTime)} — ห้ามเดินต่อเมื่อมืด`;
-    countdown.textContent = fmtMinutes(minsLeft);
-    progress.style.width = ((60 - minsLeft) / 60 * 100) + '%';
+    title.textContent = 'เหลือน้อยมาก! หาที่พักด่วน';
+    detail.textContent = `พระอาทิตย์ตก ${fmtTime(sunsetTime)}`;
+    countdown.textContent = fmtCountdown(secsLeft);  // นับถอยหลัง HH:MM:SS
+    progress.style.width = ((60 - minsLeft) / 60 * 100).toFixed(1) + '%';
+
   } else if (minsLeft <= 60) {
-    // เหลือ ≤ 60 นาที — เตือน
     bar.classList.add('warning');
     icon.textContent = '🌆';
-    title.textContent = `เหลือ ${fmtMinutes(minsLeft)} ก่อนมืด`;
-    detail.textContent = `พระอาทิตย์ตก ${fmtTime(sunsetTime)} — เริ่มหาที่พักหรือเร่งกลับ`;
-    countdown.textContent = fmtMinutes(minsLeft);
-    progress.style.width = ((60 - minsLeft) / 60 * 100) + '%';
+    title.textContent = 'เริ่มหาที่พักหรือเร่งกลับ';
+    detail.textContent = `พระอาทิตย์ตก ${fmtTime(sunsetTime)}`;
+    countdown.textContent = fmtCountdown(secsLeft);
+    progress.style.width = ((60 - minsLeft) / 60 * 100).toFixed(1) + '%';
+
   } else if (minsLeft <= 120) {
-    // เหลือ 1–2 ชั่วโมง — แจ้งสถานะ
     bar.classList.add('warning');
     icon.textContent = '🌤';
     title.textContent = `พระอาทิตย์ตก ${fmtTime(sunsetTime)}`;
-    detail.textContent = `อีก ${fmtMinutes(minsLeft)} — วางแผนเส้นทางกลับได้เลย`;
-    countdown.textContent = fmtMinutes(minsLeft);
-    progress.style.width = '20%';
+    detail.textContent = `อีก ${fmtMinsText(minsLeft)} — วางแผนกลับได้เลย`;
+    countdown.textContent = fmtCountdown(secsLeft);
+    progress.style.width = '15%';
+
   } else {
-    // ยังเหลือเวลาอีกมาก — แสดงแบบ safe
+    // safe — ตอนเช้าหรือยังมีเวลาอีกมาก
+    const nowH = now.getHours();
+    if (nowH < 6) {
+      icon.textContent = '🌙'; // ดึก
+    } else if (nowH < 10) {
+      icon.textContent = '🌅'; // เช้า
+    } else if (nowH < 15) {
+      icon.textContent = '☀️'; // กลางวัน
+    } else {
+      icon.textContent = '🌤'; // บ่าย
+    }
     bar.classList.add('safe');
-    icon.textContent = '☀️';
     title.textContent = `พระอาทิตย์ตก ${fmtTime(sunsetTime)}`;
-    detail.textContent = `อีก ${fmtMinutes(minsLeft)} — ยังมีเวลาเพียงพอ`;
-    countdown.textContent = fmtMinutes(minsLeft);
+    detail.textContent = `อีก ${fmtMinsText(minsLeft)} — ยังปลอดภัย`;
+    countdown.textContent = fmtCountdown(secsLeft);
     progress.style.width = '0%';
   }
 }
 
 function initSunsetWarning() {
-  // อัปเดตทุก 1 นาที
   if (sunsetInterval) clearInterval(sunsetInterval);
-  sunsetInterval = setInterval(updateSunsetWarning, 60000);
+  // อัปเดตทุก 1 วินาที เพื่อให้ countdown แม่นยำ
+  sunsetInterval = setInterval(updateSunsetWarning, 1000);
   updateSunsetWarning();
 }
 
