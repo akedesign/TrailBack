@@ -7,137 +7,252 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TrailBack">
-<meta name="theme-color" content="#0a0f0d">
-<title>TrailBack — นำทางกลับปลอดภัย</title>
+<meta name="theme-color" content="#0b0e17">
+<title>TrailBack</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: #0a0f0d; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: #e8f5e9; overflow: hidden; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0b0e17;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;color:#e2e8f0;overflow:hidden}
 
-.app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
+/* ── APP SHELL ── */
+.app{display:flex;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto;position:relative}
 
-/* HEADER */
-.header { background: #111a13; padding: env(safe-area-inset-top, 12px) 16px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid #1e3324; flex-shrink: 0; }
-.logo { font-size: 17px; font-weight: 600; color: #4ade80; letter-spacing: 0.04em; display: flex; align-items: center; gap: 8px; }
-.logo svg { width: 22px; height: 22px; }
-.gps-pill { display: flex; align-items: center; gap: 6px; background: #0d2b16; border: 0.5px solid #1e6e38; border-radius: 20px; padding: 4px 10px; }
-.gps-dot { width: 8px; height: 8px; border-radius: 50%; background: #6b8c72; flex-shrink: 0; transition: background 0.3s; }
-.gps-dot.active { background: #4ade80; animation: blink 2s infinite; }
-.gps-dot.error { background: #ef4444; animation: none; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.gps-text { font-size: 11px; color: #6b8c72; white-space: nowrap; }
+/* ── TOP HUD STRIP ── */
+.hud{
+  position:absolute;top:0;left:0;right:0;z-index:30;
+  padding:calc(env(safe-area-inset-top,10px) + 10px) 12px 10px;
+  display:flex;gap:8px;align-items:flex-start;pointer-events:none;
+}
+.hud-card{
+  background:rgba(15,20,35,0.72);
+  border:0.5px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-radius:12px;padding:8px 12px;
+  display:flex;align-items:center;gap:8px;pointer-events:auto;
+  flex:1;min-width:0;
+}
+.hud-icon{width:18px;height:18px;opacity:0.7;flex-shrink:0}
+.hud-inner{min-width:0}
+.hud-val{font-size:13px;font-weight:600;color:#f1f5f9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud-sub{font-size:10px;color:rgba(148,163,184,0.8);margin-top:1px}
+.hud-gps-dot{width:7px;height:7px;border-radius:50%;background:#64748b;flex-shrink:0}
+.hud-gps-dot.ok{background:#34d399;box-shadow:0 0 6px #34d39988;animation:gpspulse 2s infinite}
+.hud-gps-dot.err{background:#f87171}
+@keyframes gpspulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* MAP */
-.map-wrap { position: relative; flex: 1 1 auto; min-height: 0; background: #0d1a10; overflow: hidden; }
-#trailCanvas { display: block; width: 100%; height: 100%; }
+/* ── MAP ── */
+.map-wrap{position:relative;flex:1 1 auto;min-height:0;background:#0b0e17;overflow:hidden}
+#trailCanvas{display:block;width:100%;height:100%}
 
-.compass { position: absolute; top: 14px; right: 14px; width: 68px; height: 68px; }
-.compass svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
+/* compass */
+.compass{position:absolute;top:calc(env(safe-area-inset-top,0px) + 76px);right:12px;width:62px;height:62px;z-index:20}
+.compass svg{width:100%;height:100%;filter:drop-shadow(0 4px 12px rgba(0,0,0,.7))}
 
-.map-legend { position: absolute; bottom: 12px; left: 12px; display: flex; flex-direction: column; gap: 5px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #6b8c72; }
-.ldot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+/* scale */
+.scale-wrap{position:absolute;bottom:14px;right:14px;display:flex;flex-direction:column;align-items:flex-end;gap:3px;z-index:20}
+.scale-line{height:2px;background:rgba(148,163,184,0.5);min-width:36px;border-radius:1px}
+.scale-lbl{font-size:10px;color:rgba(148,163,184,0.6)}
 
-.scale-bar { position: absolute; bottom: 12px; right: 14px; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
-.scale-line { height: 2px; background: #4ade80; min-width: 40px; }
-.scale-label { font-size: 10px; color: #6b8c72; font-variant-numeric: tabular-nums; }
+/* legend */
+.legend{position:absolute;bottom:14px;left:12px;display:flex;flex-direction:column;gap:5px;z-index:20}
+.leg-row{display:flex;align-items:center;gap:6px;font-size:10px;color:rgba(148,163,184,0.6)}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
-/* PANEL */
-.panel { background: #0e160f; border-top: 0.5px solid #1e3324; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: 52vh; padding-bottom: env(safe-area-inset-bottom, 12px); }
+/* dist callout (like screenshot) */
+.dist-callout{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-120%);
+  background:rgba(15,20,35,0.85);border:0.5px solid rgba(255,255,255,0.15);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-radius:12px;padding:8px 16px;text-align:center;
+  display:none;z-index:25;pointer-events:none;
+}
+.dist-callout.show{display:block}
+.dist-callout::after{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);
+  border:7px solid transparent;border-top-color:rgba(15,20,35,0.85);border-bottom:none}
+.dc-val{font-size:20px;font-weight:700;color:#f1f5f9}
+.dc-lbl{font-size:10px;color:rgba(148,163,184,0.7);margin-top:1px}
 
-/* NAV CARD */
-.nav-card { display: none; margin: 12px 14px 0; background: #111a13; border: 1px solid #1e6e38; border-radius: 14px; padding: 12px 14px; }
-.nav-row { display: flex; align-items: center; gap: 12px; }
-.arrow-circle { width: 52px; height: 52px; border-radius: 50%; background: #0d2b16; border: 0.5px solid #1e6e38; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.nav-meta { flex: 1; }
-.nav-inst { font-size: 17px; font-weight: 600; color: #4ade80; }
-.nav-sub { font-size: 11px; color: #6b8c72; margin-top: 2px; }
-.nav-dist { text-align: right; }
-.nav-dist-val { font-size: 22px; font-weight: 600; color: #e8f5e9; }
-.nav-dist-unit { font-size: 11px; color: #6b8c72; }
-.arrival-bar { margin-top: 10px; height: 3px; background: #1e3324; border-radius: 2px; overflow: hidden; }
-.arrival-fill { height: 100%; background: #4ade80; border-radius: 2px; transition: width 0.5s; width: 0%; }
+/* perm btn */
+.perm-btn{
+  display:none;position:absolute;top:calc(env(safe-area-inset-top,0px)+76px);left:12px;
+  background:rgba(15,20,35,0.72);border:0.5px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-radius:10px;padding:7px 11px;font-size:11px;color:#94a3b8;cursor:pointer;z-index:20;
+}
 
-/* STATS ROW */
-.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 14px 0; }
-.stat-card { background: #111a13; border: 0.5px solid #1e3324; border-radius: 10px; padding: 10px 10px 8px; }
-.stat-label { font-size: 10px; color: #6b8c72; margin-bottom: 4px; }
-.stat-val { font-size: 18px; font-weight: 600; color: #e8f5e9; line-height: 1; }
-.stat-unit { font-size: 10px; color: #6b8c72; font-weight: 400; }
+/* ── BOTTOM SHEET ── */
+.sheet{
+  background:rgba(11,14,23,0.96);
+  border-top:0.5px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  flex-shrink:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  max-height:54vh;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+}
 
-/* ALERT */
-.alert-bar { display: none; margin: 10px 14px 0; background: #0f2b1a; border: 0.5px solid #1e6e38; border-radius: 10px; padding: 9px 12px; font-size: 12px; color: #86efac; }
-.alert-bar.danger { background: #1a0f0f; border-color: #7f1d1d; color: #fca5a5; }
+/* drag handle */
+.drag-handle{display:flex;justify-content:center;padding:10px 0 4px}
+.drag-handle span{width:36px;height:4px;background:rgba(255,255,255,0.12);border-radius:2px}
 
-/* SECTION */
-.section { padding: 12px 14px 0; }
-.section-title { font-size: 11px; color: #4ade80; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
-.wp-count { background: #0d2b16; color: #4ade80; font-size: 10px; padding: 2px 7px; border-radius: 20px; border: 0.5px solid #1e6e38; }
+/* ── NAV CARD ── */
+.nav-card{
+  display:none;margin:0 12px 10px;
+  background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(255,255,255,0.1);
+  border-radius:16px;padding:12px 14px;
+}
+.nav-top{display:flex;align-items:center;gap:12px}
+.nav-arrow-wrap{
+  width:50px;height:50px;border-radius:50%;
+  background:rgba(99,102,241,0.15);
+  border:0.5px solid rgba(99,102,241,0.4);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.nav-info{flex:1}
+.nav-inst{font-size:17px;font-weight:700;color:#f1f5f9}
+.nav-dest{font-size:11px;color:#64748b;margin-top:2px}
+.nav-right{text-align:right}
+.nav-dval{font-size:22px;font-weight:700;color:#f1f5f9;line-height:1}
+.nav-dunit{font-size:10px;color:#64748b}
+.prog-track{margin-top:10px;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#6366f1,#a78bfa);border-radius:2px;transition:width .6s ease;width:0%}
 
-/* WAYPOINT LIST */
-.wp-list { display: flex; flex-direction: column; gap: 6px; }
-.wp-item { background: #111a13; border: 0.5px solid #1e3324; border-radius: 10px; padding: 9px 12px; display: flex; align-items: center; gap: 10px; }
-.wp-item.active-target { border-color: #4ade80; }
-.wp-num { width: 28px; height: 28px; border-radius: 50%; background: #fbbf24; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #451a03; flex-shrink: 0; }
-.wp-num.target { background: #ef4444; color: #fff; animation: pulse2 1.5s infinite; }
-@keyframes pulse2 { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-.wp-info { flex: 1; min-width: 0; }
-.wp-name { font-size: 13px; font-weight: 500; color: #e8f5e9; }
-.wp-coord { font-size: 10px; color: #6b8c72; font-family: 'Courier New', monospace; margin-top: 2px; }
-.wp-actions { display: flex; gap: 6px; flex-shrink: 0; }
-.wp-btn { background: none; border: 0.5px solid #1e3324; border-radius: 6px; color: #6b8c72; cursor: pointer; padding: 4px 8px; font-size: 11px; }
-.wp-btn:active { background: #1e3324; }
-.wp-btn.nav { color: #4ade80; border-color: #1e6e38; }
-.wp-empty { font-size: 12px; color: #6b8c72; text-align: center; padding: 18px; }
+/* ── STAT ROW ── */
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 12px 0}
+.scard{
+  background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);
+  border-radius:12px;padding:10px 10px 8px;
+}
+.slbl{font-size:10px;color:#475569;margin-bottom:3px}
+.sval{font-size:17px;font-weight:700;color:#f1f5f9;line-height:1}
+.sunit{font-size:10px;color:#475569;font-weight:400}
 
-/* BUTTONS */
-.btn-section { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.btn { border: none; border-radius: 12px; padding: 14px 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; transition: transform 0.1s, opacity 0.1s; position: relative; overflow: hidden; }
-.btn:active { transform: scale(0.97); opacity: 0.85; }
-.btn svg { width: 18px; height: 18px; }
-.btn-pin { background: #15803d; color: #fff; }
-.btn-return { background: #1d4ed8; color: #fff; }
-.btn-stop { background: #111a13; color: #f87171; border: 0.5px solid #7f1d1d; display: none; }
-.btn-clear { background: #111a13; color: #6b8c72; border: 0.5px solid #1e3324; display: none; }
-.btn-full { grid-column: 1 / -1; }
+/* ── ALERT ── */
+.alertbar{
+  display:none;margin:10px 12px 0;
+  background:rgba(99,102,241,0.1);border:0.5px solid rgba(99,102,241,0.3);
+  border-radius:10px;padding:9px 12px;font-size:12px;color:#a5b4fc;
+}
+.alertbar.danger{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#fca5a5}
 
-/* TOAST */
-.toast { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 70px); left: 50%; transform: translateX(-50%) translateY(-8px); background: #1a2e1c; border: 0.5px solid #2d6a4f; border-radius: 20px; padding: 8px 16px; font-size: 13px; color: #86efac; white-space: nowrap; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.danger { background: #2d1515; border-color: #7f1d1d; color: #fca5a5; }
+/* ── SECTION ── */
+.sec{padding:12px 12px 0}
+.sec-title{
+  font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#475569;
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
+}
+.badge{background:rgba(99,102,241,0.15);color:#a5b4fc;font-size:10px;padding:2px 8px;border-radius:20px}
 
-/* COMPASS PERMISSION BTN */
-.perm-btn { display: none; position: absolute; top: 14px; right: 90px; background: #0d2b16; border: 0.5px solid #1e6e38; border-radius: 8px; padding: 6px 10px; font-size: 11px; color: #4ade80; cursor: pointer; }
+/* ── WP LIST ── */
+.wp-list{display:flex;flex-direction:column;gap:6px}
+.wp-item{
+  background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;
+}
+.wp-item.tgt{border-color:rgba(99,102,241,0.5);background:rgba(99,102,241,0.06)}
+.wp-num{
+  width:28px;height:28px;border-radius:50%;background:rgba(251,191,36,0.15);
+  border:1px solid rgba(251,191,36,0.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fbbf24;flex-shrink:0;
+}
+.wp-num.tgt{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.5);color:#f87171;animation:numPulse 1.5s infinite}
+@keyframes numPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.wp-info{flex:1;min-width:0}
+.wp-name{font-size:13px;font-weight:500;color:#e2e8f0}
+.wp-coord{font-size:10px;color:#475569;font-family:'Courier New',monospace;margin-top:2px}
+.wp-acts{display:flex;gap:6px;flex-shrink:0}
+.wb{
+  background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.1);
+  border-radius:8px;color:#64748b;cursor:pointer;padding:5px 9px;font-size:11px;
+  transition:background .15s;
+}
+.wb:active{background:rgba(255,255,255,0.1)}
+.wb.nav{color:#818cf8;border-color:rgba(99,102,241,0.3)}
+.wp-empty{font-size:12px;color:#475569;text-align:center;padding:20px;line-height:1.7}
 
-/* MODAL for waypoint name */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
-.modal-overlay.show { display: flex; }
-.modal { background: #111a13; border: 0.5px solid #2d6a4f; border-radius: 16px; padding: 20px; width: 100%; max-width: 320px; }
-.modal h3 { font-size: 16px; color: #4ade80; margin-bottom: 14px; }
-.modal input { width: 100%; background: #0a0f0d; border: 0.5px solid #1e6e38; border-radius: 10px; padding: 11px 14px; font-size: 15px; color: #e8f5e9; outline: none; }
-.modal input:focus { border-color: #4ade80; }
-.modal-coord { font-size: 11px; color: #6b8c72; font-family: 'Courier New', monospace; margin: 8px 0 16px; }
-.modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.modal-btn { border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
-.modal-btn.cancel { background: #1e3324; color: #6b8c72; }
-.modal-btn.confirm { background: #15803d; color: #fff; }
+/* ── BUTTONS ── */
+.btns{padding:12px 12px;display:flex;flex-direction:column;gap:8px}
+.brow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{
+  border:none;border-radius:14px;padding:14px 10px;font-size:14px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:transform .12s,opacity .12s;
+}
+.btn:active{transform:scale(0.96);opacity:.85}
+.btn svg{width:17px;height:17px;flex-shrink:0}
+.btn-pin{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 20px rgba(99,102,241,.35)}
+.btn-return{background:rgba(255,255,255,0.06);color:#94a3b8;border:0.5px solid rgba(255,255,255,0.1)}
+.btn-return.active{background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;border:none;box-shadow:0 4px 20px rgba(14,165,233,.3)}
+.btn-stop{display:none;background:rgba(239,68,68,0.1);color:#f87171;border:0.5px solid rgba(239,68,68,0.25)}
+.btn-clear{display:none;background:rgba(255,255,255,0.03);color:#475569;border:0.5px solid rgba(255,255,255,0.07)}
+.bfull{grid-column:1/-1}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;top:calc(env(safe-area-inset-top,0px)+68px);left:50%;
+  transform:translateX(-50%) translateY(-6px);
+  background:rgba(15,20,35,0.9);border:0.5px solid rgba(255,255,255,0.12);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-radius:20px;padding:9px 18px;font-size:13px;color:#e2e8f0;
+  white-space:nowrap;z-index:100;opacity:0;pointer-events:none;
+  transition:opacity .25s,transform .25s;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.danger{border-color:rgba(239,68,68,0.3);color:#fca5a5}
+
+/* ── MODAL ── */
+.modal-ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  z-index:200;align-items:center;justify-content:center;padding:20px;
+}
+.modal-ov.show{display:flex}
+.modal{
+  background:#0f1623;border:0.5px solid rgba(255,255,255,0.12);
+  border-radius:20px;padding:22px;width:100%;max-width:320px;
+}
+.modal h3{font-size:16px;color:#f1f5f9;margin-bottom:14px;font-weight:600}
+.modal input{
+  width:100%;background:rgba(255,255,255,0.05);
+  border:0.5px solid rgba(255,255,255,0.12);
+  border-radius:12px;padding:12px 14px;font-size:15px;color:#f1f5f9;outline:none;
+}
+.modal input:focus{border-color:rgba(99,102,241,0.6);background:rgba(99,102,241,0.05)}
+.mc{font-size:10px;color:#475569;font-family:'Courier New',monospace;margin:8px 0 16px}
+.mbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mbtn{border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:600;cursor:pointer}
+.mbtn.cancel{background:rgba(255,255,255,0.05);color:#64748b}
+.mbtn.ok{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
 </style>
 </head>
 <body>
-
 <div class="app">
-  <!-- HEADER -->
-  <div class="header">
-    <div class="logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-        <circle cx="12" cy="9" r="2.5"/>
-      </svg>
-      TrailBack
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-card" style="flex:0 0 auto;gap:7px">
+      <div class="hud-gps-dot" id="gpsDot"></div>
+      <div class="hud-inner">
+        <div class="hud-val" id="gpsVal" style="font-size:12px">รอ GPS…</div>
+        <div class="hud-sub">ตำแหน่ง</div>
+      </div>
     </div>
-    <div class="gps-pill">
-      <div class="gps-dot" id="gpsDot"></div>
-      <span class="gps-text" id="gpsLabel">รอ GPS...</span>
+    <div class="hud-card">
+      <svg class="hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      <div class="hud-inner">
+        <div class="hud-val" id="hudDist">0 ม.</div>
+        <div class="hud-sub">ระยะทางรวม</div>
+      </div>
+    </div>
+    <div class="hud-card" style="flex:0 0 auto">
+      <svg class="hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="12" x2="14.5" y2="14.5"/>
+      </svg>
+      <div class="hud-inner">
+        <div class="hud-val" id="hudHead">—°</div>
+        <div class="hud-sub">ทิศทาง</div>
+      </div>
     </div>
   </div>
 
@@ -147,722 +262,540 @@ html, body { height: 100%; background: #0a0f0d; font-family: -apple-system, 'Hel
 
     <!-- Compass -->
     <div class="compass">
-      <svg viewBox="0 0 68 68">
-        <circle cx="34" cy="34" r="32" fill="#0d1a10" stroke="#2d6a4f" stroke-width="1.5"/>
-        <circle cx="34" cy="34" r="26" fill="none" stroke="#1e3324" stroke-width="0.5"/>
-        <text x="34" y="12" text-anchor="middle" fill="#4ade80" font-size="9" font-weight="700" font-family="sans-serif">N</text>
-        <text x="34" y="62" text-anchor="middle" fill="#6b8c72" font-size="8" font-family="sans-serif">S</text>
-        <text x="8" y="38" text-anchor="middle" fill="#6b8c72" font-size="8" font-family="sans-serif">W</text>
-        <text x="60" y="38" text-anchor="middle" fill="#6b8c72" font-size="8" font-family="sans-serif">E</text>
-        <!-- Tick marks -->
-        <g stroke="#1e3324" stroke-width="0.5">
-          <line x1="34" y1="4" x2="34" y2="10"/>
-          <line x1="34" y1="58" x2="34" y2="64"/>
-          <line x1="4" y1="34" x2="10" y2="34"/>
-          <line x1="58" y1="34" x2="64" y2="34"/>
+      <svg viewBox="0 0 62 62">
+        <circle cx="31" cy="31" r="30" fill="rgba(11,14,23,0.75)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+        <circle cx="31" cy="31" r="24" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+        <text x="31" y="10" text-anchor="middle" fill="#f1f5f9" font-size="9" font-weight="700" font-family="-apple-system,sans-serif">N</text>
+        <text x="31" y="58" text-anchor="middle" fill="rgba(148,163,184,0.5)" font-size="8" font-family="-apple-system,sans-serif">S</text>
+        <text x="7"  y="35" text-anchor="middle" fill="rgba(148,163,184,0.5)" font-size="8" font-family="-apple-system,sans-serif">W</text>
+        <text x="55" y="35" text-anchor="middle" fill="rgba(148,163,184,0.5)" font-size="8" font-family="-apple-system,sans-serif">E</text>
+        <g id="compassNeedle" transform="rotate(0 31 31)">
+          <polygon points="31,13 28.5,31 31,28 33.5,31" fill="#f87171"/>
+          <polygon points="31,49 28.5,31 31,34 33.5,31" fill="rgba(148,163,184,0.4)"/>
         </g>
-        <g id="compassNeedle" transform="rotate(0 34 34)">
-          <polygon points="34,16 31,34 34,31 37,34" fill="#ef4444"/>
-          <polygon points="34,52 31,34 34,37 37,34" fill="#6b8c72"/>
-        </g>
-        <circle cx="34" cy="34" r="3" fill="#0d1a10" stroke="#4ade80" stroke-width="1"/>
+        <circle cx="31" cy="31" r="2.5" fill="#0b0e17" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
       </svg>
     </div>
 
-    <div class="map-legend">
-      <div class="legend-item"><div class="ldot" style="background:#4ade80"></div>คุณอยู่ที่นี่</div>
-      <div class="legend-item"><div class="ldot" style="background:#fbbf24"></div>Waypoints</div>
-      <div class="legend-item"><div class="ldot" style="background:#3b82f6"></div>เส้นทางที่เดิน</div>
-      <div class="legend-item" id="returnLegend" style="display:none"><div class="ldot" style="background:#4ade80; border: 1px dashed #4ade80"></div>เส้นนำทางกลับ</div>
+    <!-- Distance callout -->
+    <div class="dist-callout" id="distCallout">
+      <div class="dc-val" id="dcVal">—</div>
+      <div class="dc-lbl">Distance</div>
     </div>
 
-    <div class="scale-bar">
+    <!-- Scale -->
+    <div class="scale-wrap">
       <div class="scale-line" id="scaleLine"></div>
-      <div class="scale-label" id="scaleLabel">—</div>
+      <div class="scale-lbl" id="scaleLbl">—</div>
     </div>
 
-    <button class="perm-btn" id="permBtn" onclick="requestOrientationPermission()">🧭 เปิดเข็มทิศ</button>
+    <!-- Legend -->
+    <div class="legend">
+      <div class="leg-row"><div class="leg-dot" style="background:#34d399;box-shadow:0 0 5px #34d39966"></div>ตำแหน่งคุณ</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#fb923c;box-shadow:0 0 5px #fb923c66"></div>Waypoints</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#6366f1;box-shadow:0 0 5px #6366f166"></div>เส้นทาง</div>
+      <div class="leg-row" id="retLeg" style="display:none">
+        <div class="leg-dot" style="background:rgba(148,163,184,0.5)"></div>นำทางกลับ
+      </div>
+    </div>
+
+    <button class="perm-btn" id="permBtn" onclick="reqPerm()">🧭 เปิดเข็มทิศ</button>
   </div>
 
-  <!-- PANEL -->
-  <div class="panel">
+  <!-- SHEET -->
+  <div class="sheet">
+    <div class="drag-handle"><span></span></div>
 
     <!-- Nav card -->
     <div class="nav-card" id="navCard">
-      <div class="nav-row">
-        <div class="arrow-circle">
-          <svg id="navArrowSvg" viewBox="0 0 32 32" width="32" height="32">
-            <polygon id="navArrow" points="16,5 26,26 16,21 6,26" fill="#4ade80"/>
+      <div class="nav-top">
+        <div class="nav-arrow-wrap">
+          <svg id="navSvg" viewBox="0 0 32 32" width="30" height="30">
+            <polygon id="navArrow" points="16,5 25,25 16,20 7,25" fill="#818cf8"/>
           </svg>
         </div>
-        <div class="nav-meta">
-          <div class="nav-inst" id="navInst">ตรงไป</div>
-          <div class="nav-sub">มุ่งหน้า → <span id="navTarget">WP1</span></div>
+        <div class="nav-info">
+          <div class="nav-inst" id="navInst">เดินตรงไป</div>
+          <div class="nav-dest">→ <span id="navDest">WP1</span></div>
         </div>
-        <div class="nav-dist">
-          <div class="nav-dist-val" id="navDistVal">—</div>
-          <div class="nav-dist-unit" id="navDistUnit">เมตร</div>
+        <div class="nav-right">
+          <div class="nav-dval" id="navDval">—</div>
+          <div class="nav-dunit" id="navDunit">เมตร</div>
         </div>
       </div>
-      <div class="arrival-bar"><div class="arrival-fill" id="arrivalFill"></div></div>
+      <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
     </div>
 
     <!-- Stats -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">ระยะทางรวม</div>
-        <div class="stat-val" id="totalDist">0<span class="stat-unit"> ม.</span></div>
+    <div class="stats">
+      <div class="scard">
+        <div class="slbl">ระยะทาง</div>
+        <div class="sval" id="sDist">0<span class="sunit"> ม.</span></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Waypoints</div>
-        <div class="stat-val" id="wpCountStat">0<span class="stat-unit"> จุด</span></div>
+      <div class="scard">
+        <div class="slbl">Waypoints</div>
+        <div class="sval" id="sWp">0<span class="sunit"> จุด</span></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">ทิศเข็มทิศ</div>
-        <div class="stat-val" id="headingVal">—<span class="stat-unit"> °</span></div>
+      <div class="scard">
+        <div class="slbl">ความแม่นยำ</div>
+        <div class="sval" id="sAcc">—<span class="sunit"> ม.</span></div>
       </div>
     </div>
 
     <!-- Alert -->
-    <div class="alert-bar" id="alertBar"></div>
+    <div class="alertbar" id="alertBar"></div>
 
-    <!-- Waypoint section -->
-    <div class="section">
-      <div class="section-title">
-        Waypoints ที่ปักหมุด
-        <span class="wp-count" id="wpCountBadge">0</span>
+    <!-- WP section -->
+    <div class="sec">
+      <div class="sec-title">
+        Waypoints
+        <span class="badge" id="wpBadge">0</span>
       </div>
       <div class="wp-list" id="wpList">
-        <div class="wp-empty">ยังไม่มี waypoints<br>กด "ปักหมุดที่นี่" เพื่อบันทึกจุด</div>
+        <div class="wp-empty">ยังไม่มี waypoints<br>กด <b style="color:#818cf8">ปักหมุด</b> เพื่อบันทึกจุด</div>
       </div>
     </div>
 
-    <!-- Buttons -->
-    <div class="btn-section">
-      <div class="btn-row">
-        <button class="btn btn-pin" onclick="openPinModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2"/></svg>
+    <!-- Btns -->
+    <div class="btns">
+      <div class="brow">
+        <button class="btn btn-pin" onclick="openModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2"/>
+          </svg>
           ปักหมุดที่นี่
         </button>
-        <button class="btn btn-return" id="returnBtn" onclick="startReturn()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+        <button class="btn btn-return" id="retBtn" onclick="startReturn()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
+          </svg>
           นำทางกลับ
         </button>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-stop btn-full" id="stopBtn" onclick="stopReturn()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      <div class="brow">
+        <button class="btn btn-stop bfull" id="stopBtn" onclick="stopReturn()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+          </svg>
           หยุดนำทาง
         </button>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-clear btn-full" id="clearBtn" onclick="confirmClear()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      <div class="brow">
+        <button class="btn btn-clear bfull" id="clearBtn" onclick="doClear()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
           ล้างข้อมูลทั้งหมด
         </button>
       </div>
     </div>
-
   </div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- PIN MODAL -->
-<div class="modal-overlay" id="pinModal">
+<!-- MODAL -->
+<div class="modal-ov" id="pinModal">
   <div class="modal">
     <h3>📍 ปักหมุด Waypoint</h3>
-    <input type="text" id="pinNameInput" placeholder="ชื่อจุด เช่น ทางแยก, ลานพัก..." maxlength="30">
-    <div class="modal-coord" id="pinCoordDisplay">กำลังอ่านตำแหน่ง...</div>
-    <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="closePinModal()">ยกเลิก</button>
-      <button class="modal-btn confirm" onclick="confirmPin()">บันทึก</button>
+    <input type="text" id="pinName" placeholder="ชื่อจุด เช่น ทางแยก, ลานพัก…" maxlength="30">
+    <div class="mc" id="pinCoord">กำลังอ่านตำแหน่ง…</div>
+    <div class="mbtns">
+      <button class="mbtn cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="mbtn ok" onclick="confirmPin()">บันทึก</button>
     </div>
   </div>
 </div>
 
 <script>
-// ─── STATE ───────────────────────────────────────────────────────────────────
-const STORAGE_WP    = 'trailback_wps_v2';
-const STORAGE_TRAIL = 'trailback_trail_v2';
+// ── STATE ──────────────────────────────────────────────────────────
+const SK='trailback_wps_v3', TK='trailback_trail_v3';
+let pos=null, hdg=0, hdgLocked=false;
+let wps=JSON.parse(localStorage.getItem(SK)||'[]');
+let trail=JSON.parse(localStorage.getItem(TK)||'[]');
+let nav=false, tgt=-1, startDist=null, totalM=0, lastPt=null;
 
-let currentPos  = null;   // {lat, lon, acc}
-let heading     = 0;      // compass degrees
-let headingLocked = false;
+// ── DOM ────────────────────────────────────────────────────────────
+const canvas=document.getElementById('trailCanvas'), ctx=canvas.getContext('2d');
 
-let waypoints   = JSON.parse(localStorage.getItem(STORAGE_WP)    || '[]');
-let trail       = JSON.parse(localStorage.getItem(STORAGE_TRAIL) || '[]');
+// ── MATH ───────────────────────────────────────────────────────────
+const r=d=>d*Math.PI/180, d=r=>r*180/Math.PI;
+function hav(a,b){
+  const R=6371000,dLa=r(b.lat-a.lat),dLo=r(b.lon-a.lon);
+  return 2*R*Math.asin(Math.sqrt(Math.sin(dLa/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLo/2)**2));
+}
+function brg(f,t){
+  const dL=r(t.lon-f.lon),la1=r(f.lat),la2=r(t.lat);
+  return(d(Math.atan2(Math.sin(dL)*Math.cos(la2),Math.cos(la1)*Math.sin(la2)-Math.sin(la1)*Math.cos(la2)*Math.cos(dL)))+360)%360;
+}
+function fmt(m){return m<1000?{v:Math.round(m),u:'เมตร'}:{v:(m/1000).toFixed(2),u:'กม.'}}
+function fc(la,lo){return la.toFixed(5)+', '+lo.toFixed(5)}
 
-let navigating     = false;
-let targetIndex    = -1;   // index in waypoints[]
-let startDistance  = null; // distance when navigation started
-let totalDistM     = 0;
-
-// ─── DOM ─────────────────────────────────────────────────────────────────────
-const canvas     = document.getElementById('trailCanvas');
-const ctx        = canvas.getContext('2d');
-const gpsDot     = document.getElementById('gpsDot');
-const gpsLabel   = document.getElementById('gpsLabel');
-const wpList     = document.getElementById('wpList');
-const navCard    = document.getElementById('navCard');
-const stopBtn    = document.getElementById('stopBtn');
-const clearBtn   = document.getElementById('clearBtn');
-const alertBar   = document.getElementById('alertBar');
-const toast      = document.getElementById('toast');
-const permBtn    = document.getElementById('permBtn');
-
-// ─── UTILS ───────────────────────────────────────────────────────────────────
-const toRad = d => d * Math.PI / 180;
-const toDeg = r => r * 180 / Math.PI;
-
-function haversine(a, b) {
-  const R = 6371000;
-  const dLat = toRad(b.lat - a.lat);
-  const dLon = toRad(b.lon - a.lon);
-  const s = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLon/2)**2;
-  return 2 * R * Math.asin(Math.sqrt(s));
+// ── TOAST ──────────────────────────────────────────────────────────
+let tt;
+function toast(msg,type){
+  clearTimeout(tt);
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show'+(type===' danger'?' danger':'');
+  tt=setTimeout(()=>el.className='toast',3500);
+}
+function alert2(msg,type){
+  const el=document.getElementById('alertBar');
+  el.textContent=msg; el.className='alertbar'+(type==='danger'?' danger':'');
+  el.style.display='block';
+  if(type!=='danger')setTimeout(()=>el.style.display='none',5000);
 }
 
-function bearingTo(from, to) {
-  const dLon = toRad(to.lon - from.lon);
-  const lat1 = toRad(from.lat), lat2 = toRad(to.lat);
-  const y = Math.sin(dLon) * Math.cos(lat2);
-  const x = Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
-  return (toDeg(Math.atan2(y, x)) + 360) % 360;
+// ── CANVAS ─────────────────────────────────────────────────────────
+function resize(){
+  const w=canvas.parentElement,dpr=devicePixelRatio||1;
+  canvas.width=w.clientWidth*dpr; canvas.height=w.clientHeight*dpr;
+  canvas.style.width=w.clientWidth+'px'; canvas.style.height=w.clientHeight+'px';
+  ctx.scale(dpr,dpr); draw();
 }
 
-function fmtDist(m) {
-  if (m < 1000) return { val: Math.round(m), unit: 'เมตร' };
-  return { val: (m/1000).toFixed(2), unit: 'กม.' };
+function bounds(){
+  const all=[...trail,...wps.map(w=>({lat:w.lat,lon:w.lon}))];
+  if(pos)all.push(pos);
+  if(!all.length)return null;
+  const p=0.0004;
+  return{mnLa:Math.min(...all.map(p=>p.lat))-p,mxLa:Math.max(...all.map(p=>p.lat))+p,
+         mnLo:Math.min(...all.map(p=>p.lon))-p,mxLo:Math.max(...all.map(p=>p.lon))+p};
 }
 
-function fmtCoord(lat, lon) {
-  return lat.toFixed(5) + ', ' + lon.toFixed(5);
+function proj(pt,bn,W,H){
+  if(!bn)return{x:W/2,y:H/2};
+  const mg=32;
+  return{x:mg+(pt.lon-bn.mnLo)/(bn.mxLo-bn.mnLo||1e-6)*(W-mg*2),
+         y:mg+(1-(pt.lat-bn.mnLa)/(bn.mxLa-bn.mnLa||1e-6))*(H-mg*2)};
 }
 
-// ─── TOAST ───────────────────────────────────────────────────────────────────
-let toastTimer;
-function showToast(msg, type) {
-  clearTimeout(toastTimer);
-  toast.textContent = msg;
-  toast.className = 'toast show' + (type === 'danger' ? ' danger' : '');
-  toastTimer = setTimeout(() => toast.className = 'toast', 3500);
-}
+function draw(){
+  const dpr=devicePixelRatio||1, W=canvas.width/dpr, H=canvas.height/dpr;
+  ctx.clearRect(0,0,W,H);
 
-// ─── ALERT BAR ───────────────────────────────────────────────────────────────
-function showAlert(msg, type) {
-  alertBar.textContent = msg;
-  alertBar.className = 'alert-bar' + (type === 'danger' ? ' danger' : '');
-  alertBar.style.display = 'block';
-  if (type !== 'danger') setTimeout(() => alertBar.style.display = 'none', 5000);
-}
-function hideAlert() { alertBar.style.display = 'none'; }
-
-// ─── MAP DRAWING ──────────────────────────────────────────────────────────────
-function resizeCanvas() {
-  const wrap = canvas.parentElement;
-  canvas.width  = wrap.clientWidth  * devicePixelRatio;
-  canvas.height = wrap.clientHeight * devicePixelRatio;
-  canvas.style.width  = wrap.clientWidth  + 'px';
-  canvas.style.height = wrap.clientHeight + 'px';
-  ctx.scale(devicePixelRatio, devicePixelRatio);
-  drawMap();
-}
-
-function getBounds() {
-  const all = [];
-  trail.forEach(p => all.push(p));
-  waypoints.forEach(w => all.push({lat: w.lat, lon: w.lon}));
-  if (currentPos) all.push(currentPos);
-  if (all.length === 0) return null;
-  const pad = 0.0003;
-  return {
-    minLat: Math.min(...all.map(p=>p.lat)) - pad,
-    maxLat: Math.max(...all.map(p=>p.lat)) + pad,
-    minLon: Math.min(...all.map(p=>p.lon)) - pad,
-    maxLon: Math.max(...all.map(p=>p.lon)) + pad
-  };
-}
-
-function project(pos, bounds, W, H) {
-  if (!bounds) return {x: W/2, y: H/2};
-  const margin = 28;
-  const px = (pos.lon - bounds.minLon) / (bounds.maxLon - bounds.minLon || 1e-6);
-  const py = 1 - (pos.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat || 1e-6);
-  return { x: margin + px*(W-margin*2), y: margin + py*(H-margin*2) };
-}
-
-function drawMap() {
-  const W = canvas.width  / devicePixelRatio;
-  const H = canvas.height / devicePixelRatio;
-  ctx.clearRect(0, 0, W, H);
-
-  // bg
-  ctx.fillStyle = '#0d1a10';
-  ctx.fillRect(0, 0, W, H);
-
-  const bounds = getBounds();
-
-  // grid
-  ctx.strokeStyle = '#111e12';
-  ctx.lineWidth = 0.5;
-  for (let i = 0; i < 10; i++) {
-    ctx.beginPath(); ctx.moveTo(W*i/10, 0); ctx.lineTo(W*i/10, H); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, H*i/10); ctx.lineTo(W, H*i/10); ctx.stroke();
+  // dark bg with subtle grid
+  ctx.fillStyle='#0b0e17'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,0.025)'; ctx.lineWidth=0.5;
+  for(let i=0;i<12;i++){
+    ctx.beginPath();ctx.moveTo(W*i/12,0);ctx.lineTo(W*i/12,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,H*i/12);ctx.lineTo(W,H*i/12);ctx.stroke();
   }
 
-  // trail path
-  if (trail.length > 1) {
+  const bn=bounds();
+
+  // trail
+  if(trail.length>1){
     ctx.beginPath();
-    const p0 = project(trail[0], bounds, W, H);
-    ctx.moveTo(p0.x, p0.y);
-    for (let i = 1; i < trail.length; i++) {
-      const p = project(trail[i], bounds, W, H);
-      ctx.lineTo(p.x, p.y);
-    }
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 2.5;
+    const p0=proj(trail[0],bn,W,H);ctx.moveTo(p0.x,p0.y);
+    for(let i=1;i<trail.length;i++){const p=proj(trail[i],bn,W,H);ctx.lineTo(p.x,p.y);}
+    ctx.strokeStyle='#6366f1';ctx.lineWidth=2.5;ctx.setLineDash([]);
+    ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
+  }
+
+  // return line
+  if(nav&&pos&&tgt>=0&&tgt<wps.length){
+    const cp=proj(pos,bn,W,H),wp=wps[tgt],tp=proj({lat:wp.lat,lon:wp.lon},bn,W,H);
+    ctx.beginPath();ctx.setLineDash([10,6]);
+    ctx.strokeStyle='rgba(148,163,184,0.5)';ctx.lineWidth=1.5;
+    ctx.moveTo(cp.x,cp.y);ctx.lineTo(tp.x,tp.y);ctx.stroke();
     ctx.setLineDash([]);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.stroke();
+
+    // midpoint callout
+    const mx=(cp.x+tp.x)/2, my=(cp.y+tp.y)/2;
+    const dist=hav(pos,{lat:wp.lat,lon:wp.lon}), fd=fmt(dist);
+    const el=document.getElementById('distCallout');
+    el.style.left=mx+'px'; el.style.top=my+'px';
+    document.getElementById('dcVal').textContent=fd.v+' '+fd.u;
+    el.classList.add('show');
+  } else {
+    document.getElementById('distCallout').classList.remove('show');
   }
 
-  // return route line
-  if (navigating && currentPos && targetIndex >= 0 && targetIndex < waypoints.length) {
-    const cp = project(currentPos, bounds, W, H);
-    const wp = waypoints[targetIndex];
-    const tp = project({lat: wp.lat, lon: wp.lon}, bounds, W, H);
-    ctx.beginPath();
-    ctx.setLineDash([8, 5]);
-    ctx.strokeStyle = '#4ade80';
-    ctx.lineWidth = 2;
-    ctx.moveTo(cp.x, cp.y);
-    ctx.lineTo(tp.x, tp.y);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
+  // waypoints — glowing dots like screenshot
+  wps.forEach((wp,i)=>{
+    const p=proj({lat:wp.lat,lon:wp.lon},bn,W,H), isTgt=nav&&i===tgt;
+    const col=isTgt?'#f87171':'#fb923c';
 
-  // waypoints
-  waypoints.forEach((wp, i) => {
-    const p = project({lat: wp.lat, lon: wp.lon}, bounds, W, H);
-    const isTarget = (i === targetIndex && navigating);
+    // outer glow
+    const g1=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,28);
+    g1.addColorStop(0,isTgt?'rgba(248,113,113,0.25)':'rgba(251,146,60,0.22)');
+    g1.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();ctx.arc(p.x,p.y,28,0,Math.PI*2);
+    ctx.fillStyle=g1;ctx.fill();
 
-    if (isTarget) {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 18, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(239,68,68,0.15)';
-      ctx.fill();
-    }
+    // inner ring
+    ctx.beginPath();ctx.arc(p.x,p.y,11,0,Math.PI*2);
+    ctx.fillStyle=col+'22';ctx.fill();
+    ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.stroke();
 
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 10, 0, Math.PI*2);
-    ctx.fillStyle = isTarget ? '#ef4444' : '#fbbf24';
+    // dot
+    ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);
+    ctx.fillStyle=col;ctx.fill();
+
+    // number
+    ctx.fillStyle='#fff';ctx.font='bold 9px -apple-system,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(i+1,p.x,p.y);
+
+    // label tag
+    const lbl=wp.label.length>9?wp.label.slice(0,9)+'…':wp.label;
+    const tw=ctx.measureText(lbl).width+12;
+    ctx.fillStyle='rgba(11,14,23,0.75)';
+    roundRect(ctx,p.x-tw/2,p.y+14,tw,16,4);
     ctx.fill();
-    ctx.strokeStyle = isTarget ? '#fca5a5' : '#92400e';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    ctx.fillStyle = isTarget ? '#fff' : '#451a03';
-    ctx.font = 'bold 10px -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(i+1, p.x, p.y);
-
-    // label
-    ctx.fillStyle = '#fbbf24';
-    ctx.font = '10px -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText(wp.label.length > 8 ? wp.label.slice(0,8)+'…' : wp.label, p.x, p.y + 13);
+    ctx.fillStyle=isTgt?'#f87171':col;
+    ctx.font='10px -apple-system,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(lbl,p.x,p.y+22);
   });
 
   // current position
-  if (currentPos) {
-    const cp = project(currentPos, bounds, W, H);
+  if(pos){
+    const cp=proj(pos,bn,W,H);
 
-    // accuracy ring
-    if (currentPos.acc && bounds) {
-      const metersPerDeg = 111320;
-      const accDeg = currentPos.acc / metersPerDeg;
-      const accPx = accDeg / ((bounds.maxLat - bounds.minLat) || 1e-6) * (H - 56);
-      if (accPx > 0 && accPx < 200) {
-        ctx.beginPath();
-        ctx.arc(cp.x, cp.y, accPx, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(74,222,128,0.06)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(74,222,128,0.2)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+    // accuracy
+    if(pos.acc&&bn){
+      const mpd=111320, apx=pos.acc/mpd/(bn.mxLa-bn.mnLa||1e-6)*(H-64);
+      if(apx>0&&apx<180){
+        ctx.beginPath();ctx.arc(cp.x,cp.y,apx,0,Math.PI*2);
+        ctx.fillStyle='rgba(52,211,153,0.05)';ctx.fill();
+        ctx.strokeStyle='rgba(52,211,153,0.15)';ctx.lineWidth=1;ctx.stroke();
       }
     }
 
-    // heading indicator
-    const hRad = toRad(heading);
-    ctx.beginPath();
-    ctx.moveTo(cp.x, cp.y);
-    ctx.lineTo(cp.x + Math.sin(hRad)*24, cp.y - Math.cos(hRad)*24);
-    ctx.strokeStyle = 'rgba(74,222,128,0.5)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    // heading ray
+    const hRad=r(hdg);
+    ctx.beginPath();ctx.moveTo(cp.x,cp.y);
+    ctx.lineTo(cp.x+Math.sin(hRad)*26,cp.y-Math.cos(hRad)*26);
+    ctx.strokeStyle='rgba(52,211,153,0.45)';ctx.lineWidth=2;ctx.stroke();
+
+    // outer glow
+    const g2=ctx.createRadialGradient(cp.x,cp.y,0,cp.x,cp.y,30);
+    g2.addColorStop(0,'rgba(52,211,153,0.2)');g2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();ctx.arc(cp.x,cp.y,30,0,Math.PI*2);
+    ctx.fillStyle=g2;ctx.fill();
+
+    // ring
+    ctx.beginPath();ctx.arc(cp.x,cp.y,15,0,Math.PI*2);
+    ctx.strokeStyle='rgba(52,211,153,0.3)';ctx.lineWidth=3;ctx.stroke();
 
     // dot
-    ctx.beginPath();
-    ctx.arc(cp.x, cp.y, 9, 0, Math.PI*2);
-    ctx.fillStyle = '#4ade80';
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // pulse
-    ctx.beginPath();
-    ctx.arc(cp.x, cp.y, 16, 0, Math.PI*2);
-    ctx.strokeStyle = 'rgba(74,222,128,0.3)';
-    ctx.lineWidth = 3;
-    ctx.stroke();
+    ctx.beginPath();ctx.arc(cp.x,cp.y,8,0,Math.PI*2);
+    ctx.fillStyle='#34d399';ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=1.5;ctx.stroke();
   }
 
-  if (!currentPos && trail.length === 0) {
-    ctx.fillStyle = '#1e3324';
-    ctx.font = '13px -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('กำลังรอสัญญาณ GPS...', W/2, H/2 - 12);
-    ctx.fillStyle = '#6b8c72';
-    ctx.font = '11px -apple-system, sans-serif';
-    ctx.fillText('กรุณาให้สิทธิ์ตำแหน่งแก่ app นี้', W/2, H/2 + 12);
+  // empty state
+  if(!pos&&trail.length===0){
+    ctx.fillStyle='rgba(71,85,105,0.6)';ctx.font='13px -apple-system,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('กำลังรอสัญญาณ GPS…',W/2,H/2-10);
+    ctx.fillStyle='rgba(71,85,105,0.4)';ctx.font='11px -apple-system,sans-serif';
+    ctx.fillText('กรุณาอนุญาตตำแหน่งให้ app นี้',W/2,H/2+10);
   }
 
-  // scale bar
-  updateScaleBar(bounds, W, H);
+  scalebar(bn,W,H);
 }
 
-function updateScaleBar(bounds, W, H) {
-  if (!bounds) return;
-  const metersPerPx = (bounds.maxLon - bounds.minLon) * 111320 * Math.cos(toRad((bounds.maxLat+bounds.minLat)/2)) / (W - 56);
-  const targetPx = 50;
-  const targetM = metersPerPx * targetPx;
-  let niceDist;
-  const steps = [1,2,5,10,20,50,100,200,500,1000,2000,5000];
-  niceDist = steps.reduce((prev,cur) => Math.abs(cur-targetM) < Math.abs(prev-targetM) ? cur : prev);
-  const barPx = niceDist / metersPerPx;
-  document.getElementById('scaleLine').style.width = Math.max(20, barPx) + 'px';
-  document.getElementById('scaleLabel').textContent = niceDist >= 1000 ? (niceDist/1000)+'กม.' : niceDist+'ม.';
+function roundRect(c,x,y,w,h,r){
+  c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.arcTo(x+w,y,x+w,y+r,r);
+  c.lineTo(x+w,y+h-r);c.arcTo(x+w,y+h,x+w-r,y+h,r);c.lineTo(x+r,y+h);
+  c.arcTo(x,y+h,x,y+h-r,r);c.lineTo(x,y+r);c.arcTo(x,y,x+r,y,r);c.closePath();
 }
 
-// ─── GPS ─────────────────────────────────────────────────────────────────────
-function initGPS() {
-  if (!navigator.geolocation) {
-    gpsLabel.textContent = 'ไม่รองรับ GPS';
-    gpsDot.className = 'gps-dot error';
-    showAlert('เบราว์เซอร์นี้ไม่รองรับ GPS', 'danger');
+function scalebar(bn,W,H){
+  if(!bn)return;
+  const mpp=(bn.mxLo-bn.mnLo)*111320*Math.cos(r((bn.mxLa+bn.mnLa)/2))/(W-64);
+  const tm=mpp*48, steps=[1,2,5,10,20,50,100,200,500,1000,2000,5000];
+  const nice=steps.reduce((a,b)=>Math.abs(b-tm)<Math.abs(a-tm)?b:a);
+  const px=Math.max(20,nice/mpp);
+  document.getElementById('scaleLine').style.width=px+'px';
+  document.getElementById('scaleLbl').textContent=nice>=1000?(nice/1000)+'กม.':nice+'ม.';
+}
+
+// ── GPS ────────────────────────────────────────────────────────────
+function initGPS(){
+  if(!navigator.geolocation){
+    document.getElementById('gpsDot').className='hud-gps-dot err';
+    document.getElementById('gpsVal').textContent='ไม่รองรับ GPS';
     return;
   }
-  navigator.geolocation.watchPosition(
-    onGPSSuccess,
-    onGPSError,
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 3000 }
-  );
+  navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,timeout:15000,maximumAge:3000});
 }
-
-let lastTrailPoint = null;
-let gpsReady = false;
-
-function onGPSSuccess(pos) {
-  const lat = pos.coords.latitude;
-  const lon = pos.coords.longitude;
-  const acc = pos.coords.accuracy;
-  currentPos = { lat, lon, acc };
-
-  if (!gpsReady) {
-    gpsReady = true;
-    gpsDot.className = 'gps-dot active';
-    showToast('GPS พร้อมแล้ว ±' + Math.round(acc) + 'ม.');
+let gpsReady=false;
+function onPos(p){
+  const la=p.coords.latitude,lo=p.coords.longitude,ac=p.coords.accuracy;
+  pos={lat:la,lon:lo,acc:ac};
+  if(!gpsReady){gpsReady=true;toast('GPS พร้อม ±'+Math.round(ac)+'ม.');}
+  document.getElementById('gpsDot').className='hud-gps-dot ok';
+  document.getElementById('gpsVal').textContent='±'+Math.round(ac)+'ม.';
+  document.getElementById('sAcc').innerHTML=Math.round(ac)+'<span class="sunit"> ม.</span>';
+  if(!lastPt||hav(lastPt,pos)>5){
+    trail.push({lat:la,lon:lo});
+    if(trail.length>1)totalM+=hav(trail[trail.length-2],trail[trail.length-1]);
+    lastPt={lat:la,lon:lo};
+    if(trail.length%10===0)localStorage.setItem(TK,JSON.stringify(trail.slice(-600)));
   }
-  gpsLabel.textContent = '±' + Math.round(acc) + 'ม.';
-  gpsDot.className = 'gps-dot' + (acc < 20 ? ' active' : acc < 50 ? ' active' : ' active');
-
-  // record trail (only if moved >5m)
-  if (!lastTrailPoint || haversine(lastTrailPoint, currentPos) > 5) {
-    trail.push({ lat, lon });
-    if (trail.length > 1) totalDistM += haversine(trail[trail.length-2], trail[trail.length-1]);
-    lastTrailPoint = { lat, lon };
-    if (trail.length % 10 === 0) localStorage.setItem(STORAGE_TRAIL, JSON.stringify(trail.slice(-500)));
-  }
-
-  const d = fmtDist(totalDistM);
-  document.getElementById('totalDist').innerHTML = d.val + '<span class="stat-unit"> ' + d.unit + '</span>';
-
-  // update compass if heading from GPS
-  if (pos.coords.heading !== null && !headingLocked) {
-    heading = pos.coords.heading;
-    updateCompass();
-  }
-
-  updateNav();
-  drawMap();
+  if(p.coords.heading!==null&&!hdgLocked){hdg=p.coords.heading;updateCompass();}
+  const fd=fmt(totalM);
+  document.getElementById('sDist').innerHTML=fd.v+'<span class="sunit"> '+fd.u+'</span>';
+  document.getElementById('hudDist').textContent=fd.v+' '+fd.u;
+  updateNav();draw();
+}
+function onErr(e){
+  document.getElementById('gpsDot').className='hud-gps-dot err';
+  const m={1:'ไม่ได้รับสิทธิ์',2:'ไม่พบสัญญาณ',3:'Timeout'};
+  document.getElementById('gpsVal').textContent=m[e.code]||'GPS error';
+  alert2((m[e.code]||'GPS error')+' — ตรวจสอบการตั้งค่า Location','danger');
 }
 
-function onGPSError(err) {
-  gpsDot.className = 'gps-dot error';
-  const msgs = { 1: 'ไม่ได้รับสิทธิ์ GPS', 2: 'ไม่พบสัญญาณ GPS', 3: 'GPS timeout' };
-  gpsLabel.textContent = msgs[err.code] || 'GPS error';
-  showAlert((msgs[err.code] || 'GPS error') + ' — กรุณาตรวจสอบการตั้งค่า Location', 'danger');
+// ── COMPASS ────────────────────────────────────────────────────────
+function updateCompass(){
+  document.getElementById('compassNeedle').setAttribute('transform',`rotate(${-hdg} 31 31)`);
+  document.getElementById('hudHead').textContent=Math.round(hdg)+'°';
+  document.getElementById('headingVal')&&(document.getElementById('headingVal').innerHTML=Math.round(hdg)+'<span class="sunit"> °</span>');
 }
-
-// ─── COMPASS ─────────────────────────────────────────────────────────────────
-function updateCompass() {
-  document.getElementById('compassNeedle').setAttribute('transform', `rotate(${-heading} 34 34)`);
-  document.getElementById('headingVal').innerHTML = Math.round(heading) + '<span class="stat-unit"> °</span>';
-}
-
-function requestOrientationPermission() {
-  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-    DeviceOrientationEvent.requestPermission().then(r => {
-      if (r === 'granted') {
-        permBtn.style.display = 'none';
-        bindOrientation();
-        showToast('เปิดเข็มทิศสำเร็จ');
-      }
+function reqPerm(){
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+    DeviceOrientationEvent.requestPermission().then(r=>{
+      if(r==='granted'){document.getElementById('permBtn').style.display='none';bindOri();toast('เปิดเข็มทิศแล้ว');}
     }).catch(console.error);
   }
 }
-
-function bindOrientation() {
-  window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-  window.addEventListener('deviceorientation', handleOrientation, true);
+function bindOri(){
+  window.addEventListener('deviceorientationabsolute',handleOri,true);
+  window.addEventListener('deviceorientation',handleOri,true);
 }
-
-function handleOrientation(e) {
+function handleOri(e){
   let h;
-  if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
-    h = e.webkitCompassHeading; // iOS
-  } else if (e.alpha !== null) {
-    h = (360 - e.alpha) % 360; // Android absolute
-  }
-  if (h !== undefined) {
-    heading = h;
-    headingLocked = true;
-    updateCompass();
-  }
+  if(e.webkitCompassHeading!=null)h=e.webkitCompassHeading;
+  else if(e.alpha!=null)h=(360-e.alpha)%360;
+  if(h!=null){hdg=h;hdgLocked=true;updateCompass();}
+}
+function initCompass(){
+  if(typeof DeviceOrientationEvent==='undefined')return;
+  if(typeof DeviceOrientationEvent.requestPermission==='function')
+    document.getElementById('permBtn').style.display='block';
+  else bindOri();
 }
 
-function initCompass() {
-  if (typeof DeviceOrientationEvent !== 'undefined') {
-    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      // iOS 13+ — need user gesture
-      permBtn.style.display = 'block';
-    } else {
-      bindOrientation();
-    }
-  }
-}
-
-// ─── NAVIGATION ───────────────────────────────────────────────────────────────
-function updateNav() {
-  if (!navigating || !currentPos || targetIndex < 0 || targetIndex >= waypoints.length) return;
-
-  const wp = waypoints[targetIndex];
-  const dist = haversine(currentPos, {lat: wp.lat, lon: wp.lon});
-  const bear = bearingTo(currentPos, {lat: wp.lat, lon: wp.lon});
-
-  // distance display
-  const d = fmtDist(dist);
-  document.getElementById('navDistVal').textContent = d.val;
-  document.getElementById('navDistUnit').textContent = d.unit;
-
-  // arrival progress bar
-  if (startDistance === null) startDistance = dist;
-  const progress = startDistance > 0 ? Math.max(0, Math.min(100, (1 - dist/startDistance)*100)) : 0;
-  document.getElementById('arrivalFill').style.width = progress + '%';
-
-  // relative bearing → arrow rotation
-  const rel = ((bear - heading) + 360) % 360;
-  // rotate SVG polygon
-  const cx = 16, cy = 16;
-  document.getElementById('navArrow').setAttribute('transform', `rotate(${rel} ${cx} ${cy})`);
-
-  // instruction
-  let inst = 'เดินตรงไป';
-  if      (rel > 337.5 || rel <= 22.5)  inst = 'เดินตรงไป';
-  else if (rel > 22.5  && rel <= 67.5)  inst = 'เฉียงขวา';
-  else if (rel > 67.5  && rel <= 112.5) inst = 'เลี้ยวขวา';
-  else if (rel > 112.5 && rel <= 157.5) inst = 'เฉียงขวามาก';
-  else if (rel > 157.5 && rel <= 202.5) inst = 'หันกลับ';
-  else if (rel > 202.5 && rel <= 247.5) inst = 'เฉียงซ้ายมาก';
-  else if (rel > 247.5 && rel <= 292.5) inst = 'เลี้ยวซ้าย';
-  else if (rel > 292.5 && rel <= 337.5) inst = 'เฉียงซ้าย';
-  document.getElementById('navInst').textContent = inst;
-  document.getElementById('navTarget').textContent = 'WP' + (targetIndex+1) + ' — ' + wp.label;
-
-  // arrival check
-  if (dist < 15) {
-    if (targetIndex > 0) {
-      showToast('✅ ถึง ' + wp.label + ' แล้ว! มุ่งหน้า WP' + targetIndex);
-      targetIndex--;
-      startDistance = null;
-      document.getElementById('navTarget').textContent = 'WP' + (targetIndex+1) + ' — ' + waypoints[targetIndex].label;
-      renderWpList();
-    } else {
-      showToast('🎉 ถึงจุดเริ่มต้นแล้ว! ปลอดภัยแล้ว');
-      showAlert('🎉 ถึงจุดหมายแล้ว! คุณปลอดภัยแล้ว');
-      stopReturn();
-    }
+// ── NAVIGATION ─────────────────────────────────────────────────────
+function updateNav(){
+  if(!nav||!pos||tgt<0||tgt>=wps.length)return;
+  const wp=wps[tgt], dist=hav(pos,{lat:wp.lat,lon:wp.lon}), bear=brg(pos,{lat:wp.lat,lon:wp.lon});
+  const fd=fmt(dist);
+  document.getElementById('navDval').textContent=fd.v;
+  document.getElementById('navDunit').textContent=fd.u;
+  if(startDist===null)startDist=dist;
+  const pct=startDist>0?Math.max(0,Math.min(100,(1-dist/startDist)*100)):0;
+  document.getElementById('progFill').style.width=pct+'%';
+  const rel=((bear-hdg)+360)%360;
+  document.getElementById('navArrow').setAttribute('transform',`rotate(${rel} 16 16)`);
+  const ins=['เดินตรงไป','เฉียงขวา','เลี้ยวขวา','เฉียงขวามาก','หันกลับ','เฉียงซ้ายมาก','เลี้ยวซ้าย','เฉียงซ้าย'];
+  document.getElementById('navInst').textContent=ins[Math.round(rel/45)%8];
+  document.getElementById('navDest').textContent='WP'+(tgt+1)+' — '+wp.label;
+  if(dist<15){
+    if(tgt>0){toast('✅ ถึง '+wp.label+'! มุ่งหน้า WP'+tgt);tgt--;startDist=null;renderWps();}
+    else{toast('🎉 ถึงจุดเริ่มต้นแล้ว! ปลอดภัยแล้ว');alert2('🎉 ถึงจุดหมายแล้ว! คุณปลอดภัยแล้ว');stopReturn();}
   }
 }
-
-function startReturn() {
-  if (waypoints.length === 0) { showToast('ยังไม่มี waypoints! ปักหมุดก่อนนะ', 'danger'); return; }
-  if (!currentPos) { showToast('รอ GPS ก่อนนะ...', 'danger'); return; }
-  navigating  = true;
-  targetIndex = waypoints.length - 1;
-  startDistance = null;
-  navCard.style.display = 'block';
-  stopBtn.style.display  = 'flex';
-  document.getElementById('returnLegend').style.display = 'flex';
-  document.getElementById('returnBtn').style.display = 'none';
-  showToast('เริ่มนำทางย้อนกลับ → ' + waypoints[targetIndex].label);
-  renderWpList();
-  updateNav();
-  drawMap();
+function startReturn(){
+  if(!wps.length){toast('ยังไม่มี waypoints!','danger');return;}
+  if(!pos){toast('รอ GPS ก่อน','danger');return;}
+  nav=true;tgt=wps.length-1;startDist=null;
+  document.getElementById('navCard').style.display='block';
+  document.getElementById('stopBtn').style.display='flex';
+  document.getElementById('retLeg').style.display='flex';
+  document.getElementById('retBtn').className='btn btn-return active';
+  renderWps();updateNav();draw();
+  toast('เริ่มนำทาง → '+wps[tgt].label);
+}
+function stopReturn(){
+  nav=false;tgt=-1;startDist=null;
+  document.getElementById('navCard').style.display='none';
+  document.getElementById('stopBtn').style.display='none';
+  document.getElementById('retLeg').style.display='none';
+  document.getElementById('retBtn').className='btn btn-return';
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('distCallout').classList.remove('show');
+  renderWps();draw();
 }
 
-function stopReturn() {
-  navigating  = false;
-  targetIndex = -1;
-  startDistance = null;
-  navCard.style.display = 'none';
-  stopBtn.style.display  = 'none';
-  document.getElementById('returnLegend').style.display = 'none';
-  document.getElementById('returnBtn').style.display = '';
-  document.getElementById('arrivalFill').style.width = '0%';
-  renderWpList();
-  drawMap();
-}
-
-// ─── WAYPOINTS ────────────────────────────────────────────────────────────────
-function openPinModal() {
-  if (!currentPos) { showToast('รอ GPS ก่อนนะ...', 'danger'); return; }
-  document.getElementById('pinNameInput').value = 'WP' + (waypoints.length + 1);
-  document.getElementById('pinCoordDisplay').textContent = fmtCoord(currentPos.lat, currentPos.lon);
+// ── WAYPOINTS ──────────────────────────────────────────────────────
+function openModal(){
+  if(!pos){toast('รอ GPS ก่อน','danger');return;}
+  document.getElementById('pinName').value='WP'+(wps.length+1);
+  document.getElementById('pinCoord').textContent=fc(pos.lat,pos.lon);
   document.getElementById('pinModal').classList.add('show');
-  setTimeout(() => document.getElementById('pinNameInput').select(), 100);
+  setTimeout(()=>document.getElementById('pinName').select(),80);
 }
-
-function closePinModal() {
-  document.getElementById('pinModal').classList.remove('show');
+function closeModal(){document.getElementById('pinModal').classList.remove('show');}
+function confirmPin(){
+  if(!pos)return;
+  const name=document.getElementById('pinName').value.trim()||('WP'+(wps.length+1));
+  wps.push({lat:pos.lat,lon:pos.lon,label:name,time:Date.now()});
+  localStorage.setItem(SK,JSON.stringify(wps));
+  closeModal();renderWps();draw();toast('📍 ปักหมุด "'+name+'" เรียบร้อย!');
 }
-
-function confirmPin() {
-  if (!currentPos) return;
-  const name = document.getElementById('pinNameInput').value.trim() || ('WP' + (waypoints.length + 1));
-  waypoints.push({ lat: currentPos.lat, lon: currentPos.lon, label: name, time: Date.now() });
-  localStorage.setItem(STORAGE_WP, JSON.stringify(waypoints));
-  closePinModal();
-  renderWpList();
-  drawMap();
-  showToast('📍 ปักหมุด "' + name + '" เรียบร้อย!');
-}
-
-document.getElementById('pinNameInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') confirmPin();
-  if (e.key === 'Escape') closePinModal();
+document.getElementById('pinName').addEventListener('keydown',e=>{
+  if(e.key==='Enter')confirmPin();if(e.key==='Escape')closeModal();
 });
+document.getElementById('pinModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-function deleteWp(i) {
-  if (!confirm('ลบ "' + waypoints[i].label + '" ?')) return;
-  waypoints.splice(i, 1);
-  localStorage.setItem(STORAGE_WP, JSON.stringify(waypoints));
-  if (navigating) stopReturn();
-  renderWpList();
-  drawMap();
+function deleteWp(i){
+  if(!confirm('ลบ "'+wps[i].label+'" ?'))return;
+  wps.splice(i,1);localStorage.setItem(SK,JSON.stringify(wps));
+  if(nav)stopReturn();renderWps();draw();
 }
-
-function navToWp(i) {
-  if (!currentPos) { showToast('รอ GPS ก่อนนะ...', 'danger'); return; }
-  navigating  = true;
-  targetIndex = i;
-  startDistance = null;
-  navCard.style.display = 'block';
-  stopBtn.style.display  = 'flex';
-  document.getElementById('returnLegend').style.display = 'flex';
-  document.getElementById('returnBtn').style.display = 'none';
-  renderWpList();
-  updateNav();
-  drawMap();
-  showToast('นำทางไป ' + waypoints[i].label);
+function navToWp(i){
+  if(!pos){toast('รอ GPS ก่อน','danger');return;}
+  nav=true;tgt=i;startDist=null;
+  document.getElementById('navCard').style.display='block';
+  document.getElementById('stopBtn').style.display='flex';
+  document.getElementById('retLeg').style.display='flex';
+  document.getElementById('retBtn').className='btn btn-return active';
+  renderWps();updateNav();draw();toast('นำทางไป '+wps[i].label);
 }
-
-function confirmClear() {
-  if (!confirm('ล้างข้อมูลทั้งหมด? (waypoints + เส้นทางที่เดิน)')) return;
-  waypoints = [];
-  trail = [];
-  totalDistM = 0;
-  lastTrailPoint = null;
-  localStorage.removeItem(STORAGE_WP);
-  localStorage.removeItem(STORAGE_TRAIL);
-  stopReturn();
-  renderWpList();
-  drawMap();
-  document.getElementById('totalDist').innerHTML = '0<span class="stat-unit"> ม.</span>';
-  showToast('ล้างข้อมูลแล้ว');
+function doClear(){
+  if(!confirm('ล้างข้อมูลทั้งหมด?'))return;
+  wps=[];trail=[];totalM=0;lastPt=null;
+  localStorage.removeItem(SK);localStorage.removeItem(TK);
+  stopReturn();renderWps();draw();
+  document.getElementById('sDist').innerHTML='0<span class="sunit"> ม.</span>';
+  document.getElementById('hudDist').textContent='0 ม.';
+  toast('ล้างข้อมูลแล้ว');
 }
-
-function renderWpList() {
-  const count = waypoints.length;
-  document.getElementById('wpCountStat').innerHTML = count + '<span class="stat-unit"> จุด</span>';
-  document.getElementById('wpCountBadge').textContent = count;
-  clearBtn.style.display = count > 0 ? '' : 'none';
-
-  if (count === 0) {
-    wpList.innerHTML = '<div class="wp-empty">ยังไม่มี waypoints<br>กด "ปักหมุดที่นี่" เพื่อบันทึกจุด</div>';
-    return;
-  }
-
-  wpList.innerHTML = waypoints.map((wp, i) => {
-    const isTarget = navigating && i === targetIndex;
-    return `
-      <div class="wp-item${isTarget ? ' active-target' : ''}">
-        <div class="wp-num${isTarget ? ' target' : ''}">${i+1}</div>
-        <div class="wp-info">
-          <div class="wp-name">${wp.label}</div>
-          <div class="wp-coord">${fmtCoord(wp.lat, wp.lon)}</div>
-        </div>
-        <div class="wp-actions">
-          <button class="wp-btn nav" onclick="navToWp(${i})">นำทาง</button>
-          <button class="wp-btn" onclick="deleteWp(${i})">ลบ</button>
-        </div>
+function renderWps(){
+  const n=wps.length;
+  document.getElementById('sWp').innerHTML=n+'<span class="sunit"> จุด</span>';
+  document.getElementById('wpBadge').textContent=n;
+  document.getElementById('clearBtn').style.display=n?'':'none';
+  if(!n){document.getElementById('wpList').innerHTML='<div class="wp-empty">ยังไม่มี waypoints<br>กด <b style="color:#818cf8">ปักหมุด</b> เพื่อบันทึกจุด</div>';return;}
+  document.getElementById('wpList').innerHTML=wps.map((wp,i)=>{
+    const iT=nav&&i===tgt;
+    return`<div class="wp-item${iT?' tgt':''}">
+      <div class="wp-num${iT?' tgt':''}">${i+1}</div>
+      <div class="wp-info">
+        <div class="wp-name">${wp.label}</div>
+        <div class="wp-coord">${fc(wp.lat,wp.lon)}</div>
       </div>
-    `;
+      <div class="wp-acts">
+        <button class="wb nav" onclick="navToWp(${i})">นำทาง</button>
+        <button class="wb" onclick="deleteWp(${i})">ลบ</button>
+      </div>
+    </div>`;
   }).join('');
 }
 
-// ─── MODAL CLOSE ON BACKDROP ─────────────────────────────────────────────────
-document.getElementById('pinModal').addEventListener('click', function(e) {
-  if (e.target === this) closePinModal();
-});
-
-// ─── PREVENT SCROLL BOUNCE on body ───────────────────────────────────────────
-document.addEventListener('touchmove', e => {
-  if (!e.target.closest('.panel')) e.preventDefault();
-}, { passive: false });
-
-// ─── INIT ────────────────────────────────────────────────────────────────────
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-renderWpList();
-initGPS();
-initCompass();
-
-// auto-save trail every 30s
-setInterval(() => {
-  if (trail.length > 0) localStorage.setItem(STORAGE_TRAIL, JSON.stringify(trail.slice(-500)));
-}, 30000);
-
-// redraw loop for heading animation
-setInterval(() => { if (currentPos) drawMap(); }, 2000);
+// ── INIT ───────────────────────────────────────────────────────────
+document.addEventListener('touchmove',e=>{if(!e.target.closest('.sheet'))e.preventDefault();},{passive:false});
+window.addEventListener('resize',resize);
+resize(); renderWps(); initGPS(); initCompass();
+setInterval(()=>{if(trail.length)localStorage.setItem(TK,JSON.stringify(trail.slice(-600)));},30000);
+setInterval(()=>{if(pos)draw();},2000);
 </script>
 </body>
 </html>
