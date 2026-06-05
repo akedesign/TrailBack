@@ -704,7 +704,7 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
 <div class="sos-overlay flash-off" id="sosOverlay" onclick="stopSOS()">
   <div class="sos-hud">
     <div class="sos-morse-display" id="sosMorseDisplay">· · · − − − · · ·</div>
-    <div class="sos-label" id="sosLabel">SOS กำลังส่งสัญญาณ</div>
+    <div class="sos-label" id="sosLabel">🔊 SOS กำลังส่งสัญญาณ</div>
     <div class="sos-stop-hint">แตะหน้าจอเพื่อหยุด</div>
     <div class="sos-counter" id="sosCounter">รอบที่ 1</div>
   </div>
@@ -1602,26 +1602,55 @@ function initSunsetWarning() {
 }
 
 // ── SOS FLASHLIGHT ────────────────────────────────────────────────
-// Morse SOS: ···−−−··· (short=200ms, long=600ms, gap=200ms, letterGap=600ms)
 const SOS_DOT  = 200;
 const SOS_DASH = 600;
-const SOS_GAP  = 200;  // gap ระหว่าง symbol
-const SOS_LETTER_GAP = 600; // gap ระหว่างตัวอักษร S, O, S
-const SOS_REPEAT_GAP = 1200; // gap ก่อนวนรอบใหม่
+const SOS_GAP  = 200;
+const SOS_LETTER_GAP = 600;
+const SOS_REPEAT_GAP = 1200;
 
-// sequence: [duration_on, duration_off, ...]
+// Web Audio context สำหรับเสียง beep
+let sosAudioCtx = null;
+let sosOscillator = null;
+let sosGain = null;
+
+function initSOSAudio() {
+  if (sosAudioCtx) return;
+  sosAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  sosGain = sosAudioCtx.createGain();
+  sosGain.gain.value = 0;
+  sosGain.connect(sosAudioCtx.destination);
+}
+
+function beepOn() {
+  if (!sosAudioCtx) return;
+  if (sosOscillator) { try { sosOscillator.stop(); } catch(e){} }
+  sosOscillator = sosAudioCtx.createOscillator();
+  sosOscillator.type = 'sine';
+  sosOscillator.frequency.value = 880; // A5 — ดังชัด ได้ยินไกล
+  sosOscillator.connect(sosGain);
+  sosOscillator.start();
+  sosGain.gain.setTargetAtTime(1.0, sosAudioCtx.currentTime, 0.01);
+}
+
+function beepOff() {
+  if (!sosAudioCtx || !sosOscillator) return;
+  sosGain.gain.setTargetAtTime(0, sosAudioCtx.currentTime, 0.015);
+  const osc = sosOscillator;
+  setTimeout(() => { try { osc.stop(); } catch(e){} }, 80);
+  sosOscillator = null;
+}
+
 function buildSOSSequence() {
   const dot  = [SOS_DOT, SOS_GAP];
   const dash = [SOS_DASH, SOS_GAP];
-  const lg   = [0, SOS_LETTER_GAP]; // letter gap (off)
-  // S = ... / O = --- / S = ...
+  const lg   = [0, SOS_LETTER_GAP];
   return [
-    ...dot, ...dot, ...dot,   // S
+    ...dot, ...dot, ...dot,
     ...lg,
-    ...dash, ...dash, ...dash, // O
+    ...dash, ...dash, ...dash,
     ...lg,
-    ...dot, ...dot, ...dot,   // S
-    0, SOS_REPEAT_GAP          // pause ก่อนวนใหม่
+    ...dot, ...dot, ...dot,
+    0, SOS_REPEAT_GAP
   ];
 }
 
@@ -1637,26 +1666,26 @@ function toggleSOS() {
 function startSOS() {
   sosActive = true;
   sosRound = 0;
+  initSOSAudio(); // ต้องเรียกตอน user gesture
+  if (sosAudioCtx && sosAudioCtx.state === 'suspended') {
+    sosAudioCtx.resume();
+  }
   document.getElementById('sosBtn').classList.add('active');
   document.getElementById('sosBtn').innerHTML = `
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
     หยุด SOS
   `;
   document.getElementById('sosOverlay').classList.add('show');
-
-  // ขอ wake lock ป้องกันหน้าจอดับ
   if ('wakeLock' in navigator) {
     navigator.wakeLock.request('screen').catch(() => {});
   }
-
   runSOSLoop();
 }
 
 function runSOSLoop() {
   if (!sosActive) return;
   sosRound++;
-  document.getElementById('sosCounter').textContent = `รอบที่ ${sosRound} — กด 3 ครั้ง ทุก 10 วินาที`;
-
+  document.getElementById('sosCounter').textContent = `รอบที่ ${sosRound}`;
   const seq = buildSOSSequence();
   let t = 0;
   for (let i = 0; i < seq.length; i += 2) {
@@ -1669,7 +1698,6 @@ function runSOSLoop() {
     sosTimers.push(setTimeout(() => flashOff(), t));
     t += offDur;
   }
-  // วนรอบใหม่
   sosTimers.push(setTimeout(() => { if (sosActive) runSOSLoop(); }, t));
 }
 
@@ -1678,12 +1706,14 @@ function flashOn() {
   const ov = document.getElementById('sosOverlay');
   ov.classList.remove('flash-off');
   ov.classList.add('flash-on');
+  beepOn();
 }
 
 function flashOff() {
   const ov = document.getElementById('sosOverlay');
   ov.classList.remove('flash-on');
   ov.classList.add('flash-off');
+  beepOff();
 }
 
 function stopSOS() {
@@ -1691,6 +1721,10 @@ function stopSOS() {
   sosTimers.forEach(t => clearTimeout(t));
   sosTimers = [];
   flashOff();
+  beepOff();
+  if (sosAudioCtx) {
+    sosAudioCtx.suspend();
+  }
   document.getElementById('sosOverlay').classList.remove('show');
   document.getElementById('sosBtn').classList.remove('active');
   document.getElementById('sosBtn').innerHTML = `
