@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ambex TrailBack">
 <meta name="theme-color" content="#1C1C29">
-<title>Ambex TrailBack V0.8</title>
+<title>Ambex TrailBack V0.9</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -397,7 +397,7 @@ button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight:
       </svg>
       <div>
         <div style="font-size:11px;font-weight:400;color:#8a2408;letter-spacing:0.12em;line-height:1;margin-bottom:1px">AMBEX</div>
-        <div style="font-size:16px;font-weight:700;color:#F44019;letter-spacing:0.03em;line-height:1">TrailBack <span style="font-size:10px;font-weight:400;color:#8a2408">V0.8</span></div>
+        <div style="font-size:16px;font-weight:700;color:#F44019;letter-spacing:0.03em;line-height:1">TrailBack <span style="font-size:10px;font-weight:400;color:#8a2408">V0.9</span></div>
       </div>
     </div>
     <div class="gps-pill">
@@ -1903,19 +1903,19 @@ function toggleSOS() {
 function startSOS() {
   sosActive = true;
   sosRound = 0;
-  initSOSAudio(); // ต้องเรียกตอน user gesture
+  initSOSAudio();
   if (sosAudioCtx && sosAudioCtx.state === 'suspended') {
     sosAudioCtx.resume();
   }
-  document.getElementById('sosBtn').classList.add('active');
-  document.getElementById('sosBtn').innerHTML = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-    หยุด SOS
-  `;
   document.getElementById('sosOverlay').classList.add('show');
   if ('wakeLock' in navigator) {
     navigator.wakeLock.request('screen').catch(() => {});
   }
+  // อัปเดต FAB icon
+  const fabIcon = document.getElementById('fabSosIcon');
+  const fabLbl  = document.getElementById('fabSosLabel');
+  if (fabIcon) fabIcon.style.background = 'linear-gradient(135deg,#166534,#16a34a)';
+  if (fabLbl)  fabLbl.textContent = 'หยุด SOS';
   runSOSLoop();
 }
 
@@ -1961,17 +1961,11 @@ function stopSOS() {
   beepOff();
   if (sosAudioCtx) sosAudioCtx.suspend();
   document.getElementById('sosOverlay').classList.remove('show');
-  // reset sosBtn ถ้ามี
-  const sosBtn = document.getElementById('sosBtn');
-  if (sosBtn) {
-    sosBtn.classList.remove('active');
-    sosBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 🆘 SOS Flashlight`;
-  }
-  // reset FAB SOS icon
+  // reset FAB icon
   const fabIcon = document.getElementById('fabSosIcon');
-  if (fabIcon) { fabIcon.style.background = 'linear-gradient(135deg,#dc2626,#f87171)'; }
-  const fabLbl = document.getElementById('fabSosLabel');
-  if (fabLbl) { fabLbl.textContent = 'SOS'; }
+  const fabLbl  = document.getElementById('fabSosLabel');
+  if (fabIcon) fabIcon.style.background = 'linear-gradient(135deg,#dc2626,#f87171)';
+  if (fabLbl)  fabLbl.textContent = 'SOS';
 }
 
 // ── COMMUNITY ─────────────────────────────────────────────────────
