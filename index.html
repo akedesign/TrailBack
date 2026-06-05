@@ -1456,7 +1456,8 @@ document.getElementById('survivalModal').addEventListener('click', function(e) {
 
 // ── INIT ──────────────────────────────────────────────────────────
 document.addEventListener('touchmove', e => {
-  if (!e.target.closest('.panel')) e.preventDefault();
+  const allowed = e.target.closest('.panel, .sv-content, .sv-tabs, .survival-sheet');
+  if (!allowed) e.preventDefault();
 }, { passive: false });
 
 window.addEventListener('resize', resizeCanvas);
