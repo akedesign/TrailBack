@@ -74,10 +74,12 @@ html,body{height:100%;background:#0b0e17;font-family:-apple-system,'SF Pro Displ
 /* perm btn */
 .perm-btn{
   display:none;position:absolute;top:calc(env(safe-area-inset-top,0px)+76px);left:12px;
-  background:rgba(15,20,35,0.72);border:0.5px solid rgba(255,255,255,0.1);
+  background:rgba(99,102,241,0.18);border:0.5px solid rgba(99,102,241,0.4);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border-radius:10px;padding:7px 11px;font-size:11px;color:#94a3b8;cursor:pointer;z-index:20;
+  border-radius:10px;padding:8px 13px;font-size:12px;color:#a5b4fc;cursor:pointer;z-index:20;
+  font-weight:600;animation:permPulse 2s infinite;
 }
+@keyframes permPulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,0.4)}50%{box-shadow:0 0 0 6px rgba(99,102,241,0)}}
 
 /* ── BOTTOM SHEET ── */
 .sheet{
@@ -184,6 +186,7 @@ html,body{height:100%;background:#0b0e17;font-family:-apple-system,'SF Pro Displ
 .btn-return.active{background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;border:none;box-shadow:0 4px 20px rgba(14,165,233,.3)}
 .btn-stop{display:none;background:rgba(239,68,68,0.1);color:#f87171;border:0.5px solid rgba(239,68,68,0.25)}
 .btn-clear{display:none;background:rgba(255,255,255,0.03);color:#475569;border:0.5px solid rgba(255,255,255,0.07)}
+.btn-reset{background:rgba(255,255,255,0.03);color:#64748b;border:0.5px solid rgba(255,255,255,0.08)}
 .bfull{grid-column:1/-1}
 
 /* ── TOAST ── */
@@ -381,12 +384,11 @@ html,body{height:100%;background:#0b0e17;font-family:-apple-system,'SF Pro Displ
         </button>
       </div>
       <div class="brow">
-        <button class="btn btn-clear bfull" id="clearBtn" onclick="doClear()">
+        <button class="btn btn-reset bfull" id="clearBtn" onclick="openResetModal()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-            <path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
           </svg>
-          ล้างข้อมูลทั้งหมด
+          รีเซ็ทข้อมูล
         </button>
       </div>
     </div>
@@ -396,8 +398,24 @@ html,body{height:100%;background:#0b0e17;font-family:-apple-system,'SF Pro Displ
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- MODAL -->
-<div class="modal-ov" id="pinModal">
+<!-- RESET MODAL -->
+<div class="modal-ov" id="resetModal">
+  <div class="modal">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="width:52px;height:52px;border-radius:50%;background:rgba(239,68,68,0.12);border:0.5px solid rgba(239,68,68,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
+        </svg>
+      </div>
+      <h3 style="font-size:17px;color:#f1f5f9;margin-bottom:6px">รีเซ็ทข้อมูลทั้งหมด?</h3>
+      <p style="font-size:13px;color:#64748b;line-height:1.6">Waypoints และเส้นทางที่เดินทั้งหมด<br>จะถูกลบออกอย่างถาวร</p>
+    </div>
+    <div class="mbtns">
+      <button class="mbtn cancel" onclick="closeResetModal()">ยกเลิก</button>
+      <button class="mbtn" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff" onclick="confirmReset()">รีเซ็ทเลย</button>
+    </div>
+  </div>
+</div>
   <div class="modal">
     <h3>📍 ปักหมุด Waypoint</h3>
     <input type="text" id="pinName" placeholder="ชื่อจุด เช่น ทางแยก, ลานพัก…" maxlength="30">
@@ -661,7 +679,8 @@ function updateCompass(){
 function reqPerm(){
   if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     DeviceOrientationEvent.requestPermission().then(r=>{
-      if(r==='granted'){document.getElementById('permBtn').style.display='none';bindOri();toast('เปิดเข็มทิศแล้ว');}
+      if(r==='granted'){document.getElementById('permBtn').style.display='none';bindOri();toast('เปิดเข็มทิศแล้ว ✓');}
+      else toast('ไม่ได้รับสิทธิ์เข็มทิศ','danger');
     }).catch(console.error);
   }
 }
@@ -671,16 +690,34 @@ function bindOri(){
 }
 function handleOri(e){
   let h;
-  if(e.webkitCompassHeading!=null)h=e.webkitCompassHeading;
+  if(e.webkitCompassHeading!=null&&e.webkitCompassHeading!==0)h=e.webkitCompassHeading;
+  else if(e.absolute&&e.alpha!=null)h=(360-e.alpha)%360;
   else if(e.alpha!=null)h=(360-e.alpha)%360;
-  if(h!=null){hdg=h;hdgLocked=true;updateCompass();}
+  if(h!=null){hdg=h;hdgLocked=true;updateCompass();draw();}
 }
 function initCompass(){
   if(typeof DeviceOrientationEvent==='undefined')return;
-  if(typeof DeviceOrientationEvent.requestPermission==='function')
+  if(typeof DeviceOrientationEvent.requestPermission==='function'){
+    // iOS 13+ — show tap-to-enable button (can't auto-request without gesture)
     document.getElementById('permBtn').style.display='block';
-  else bindOri();
+  } else {
+    // Android + desktop — bind directly, no permission needed
+    bindOri();
+  }
 }
+function openResetModal(){document.getElementById('resetModal').classList.add('show');}
+function closeResetModal(){document.getElementById('resetModal').classList.remove('show');}
+function confirmReset(){
+  wps=[];trail=[];totalM=0;lastPt=null;
+  localStorage.removeItem(SK);localStorage.removeItem(TK);
+  closeResetModal();
+  stopReturn();renderWps();draw();
+  document.getElementById('sDist').innerHTML='0<span class="sunit"> ม.</span>';
+  document.getElementById('hudDist').textContent='0 ม.';
+  document.getElementById('sAcc').innerHTML='—<span class="sunit"> ม.</span>';
+  toast('รีเซ็ทเรียบร้อยแล้ว ✓');
+}
+function doClear(){openResetModal();}
 
 // ── NAVIGATION ─────────────────────────────────────────────────────
 function updateNav(){
@@ -744,6 +781,7 @@ document.getElementById('pinName').addEventListener('keydown',e=>{
   if(e.key==='Enter')confirmPin();if(e.key==='Escape')closeModal();
 });
 document.getElementById('pinModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('resetModal').addEventListener('click',function(e){if(e.target===this)closeResetModal();});
 
 function deleteWp(i){
   if(!confirm('ลบ "'+wps[i].label+'" ?'))return;
@@ -772,7 +810,6 @@ function renderWps(){
   const n=wps.length;
   document.getElementById('sWp').innerHTML=n+'<span class="sunit"> จุด</span>';
   document.getElementById('wpBadge').textContent=n;
-  document.getElementById('clearBtn').style.display=n?'':'none';
   if(!n){document.getElementById('wpList').innerHTML='<div class="wp-empty">ยังไม่มี waypoints<br>กด <b style="color:#818cf8">ปักหมุด</b> เพื่อบันทึกจุด</div>';return;}
   document.getElementById('wpList').innerHTML=wps.map((wp,i)=>{
     const iT=nav&&i===tgt;
