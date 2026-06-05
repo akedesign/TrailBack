@@ -6,87 +6,90 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="TrailBack">
-<meta name="theme-color" content="#0a0f0d">
-<title>TrailBack — นำทางกลับปลอดภัย</title>
+<meta name="apple-mobile-web-app-title" content="Ambex TrailBack">
+<meta name="theme-color" content="#1C1C29">
+<title>Ambex TrailBack V0.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: #0a0f0d; font-family: -apple-system, 'Helvetica Neue', sans-serif; color: #e8f5e9; overflow: hidden; }
+html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-system, 'Helvetica Neue', sans-serif; color: #e8f5e9; overflow: hidden; }
 .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
 
 /* HEADER */
-.header { background: #111a13; padding: env(safe-area-inset-top, 12px) 16px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid #1e3324; flex-shrink: 0; }
-.logo { font-size: 17px; font-weight: 600; color: #4ade80; letter-spacing: 0.04em; display: flex; align-items: center; gap: 8px; }
+.header { background: #1E1E2E; padding: env(safe-area-inset-top, 12px) 16px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid #2A2A3D; flex-shrink: 0; }
+.logo { font-size: 17px; font-weight: 600; color: #F44019; letter-spacing: 0.04em; display: flex; align-items: center; gap: 8px; }
 .logo svg { width: 22px; height: 22px; }
-.gps-pill { display: flex; align-items: center; gap: 6px; background: #0d2b16; border: 0.5px solid #1e6e38; border-radius: 20px; padding: 4px 10px; }
-.gps-dot { width: 8px; height: 8px; border-radius: 50%; background: #6b8c72; flex-shrink: 0; transition: background 0.3s; }
-.gps-dot.active { background: #4ade80; animation: blink 2s infinite; }
+.gps-pill { display: flex; align-items: center; gap: 6px; background: #14142A; border: 0.5px solid #c43315; border-radius: 20px; padding: 4px 10px; }
+.gps-dot { width: 8px; height: 8px; border-radius: 50%; background: #7070A0; flex-shrink: 0; transition: background 0.3s; }
+.gps-dot.active { background: #F44019; animation: blink 2s infinite; }
 .gps-dot.error { background: #ef4444; animation: none; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.gps-text { font-size: 11px; color: #6b8c72; white-space: nowrap; }
+.gps-text { font-size: 11px; color: #7070A0; white-space: nowrap; }
 
 /* MAP */
-.map-wrap { position: relative; flex: 1 1 auto; min-height: 0; background: #0d1a10; overflow: hidden; }
+.map-wrap { position: relative; flex: 1 1 auto; min-height: 0; background: #16161F; overflow: hidden; }
 #trailCanvas { display: block; width: 100%; height: 100%; }
 
 .compass { position: absolute; top: 14px; right: 14px; width: 68px; height: 68px; }
 .compass svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
 
 .map-legend { position: absolute; bottom: 12px; left: 12px; display: flex; flex-direction: column; gap: 5px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #6b8c72; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #7070A0; }
 .ldot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
 .scale-bar { position: absolute; bottom: 12px; right: 14px; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
-.scale-line { height: 2px; background: #4ade80; min-width: 40px; }
-.scale-label { font-size: 10px; color: #6b8c72; font-variant-numeric: tabular-nums; }
+.scale-line { height: 2px; background: #F44019; min-width: 40px; }
+.scale-label { font-size: 10px; color: #7070A0; font-variant-numeric: tabular-nums; }
 
 /* PANEL */
-.panel { background: #0e160f; border-top: 0.5px solid #1e3324; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: 52vh; padding-bottom: env(safe-area-inset-bottom, 12px); }
+.panel { background: #191924; border-top: 0.5px solid #2A2A3D; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: 52vh; padding-bottom: env(safe-area-inset-bottom, 12px); }
 
 /* NAV CARD */
-.nav-card { display: none; margin: 12px 14px 0; background: #111a13; border: 1px solid #1e6e38; border-radius: 14px; padding: 12px 14px; }
+.nav-card { display: none; margin: 12px 14px 0; background: #1E1E2E; border: 1px solid #c43315; border-radius: 14px; padding: 12px 14px; }
 .nav-row { display: flex; align-items: center; gap: 12px; }
-.arrow-circle { width: 52px; height: 52px; border-radius: 50%; background: #0d2b16; border: 0.5px solid #1e6e38; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.arrow-circle { width: 52px; height: 52px; border-radius: 50%; background: #14142A; border: 0.5px solid #c43315; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .nav-meta { flex: 1; }
-.nav-inst { font-size: 17px; font-weight: 600; color: #4ade80; }
-.nav-sub { font-size: 11px; color: #6b8c72; margin-top: 2px; }
+.nav-inst { font-size: 17px; font-weight: 600; color: #F44019; }
+.nav-sub { font-size: 11px; color: #7070A0; margin-top: 2px; }
 .nav-dist { text-align: right; }
 .nav-dist-val { font-size: 22px; font-weight: 600; color: #e8f5e9; }
-.nav-dist-unit { font-size: 11px; color: #6b8c72; }
-.arrival-bar { margin-top: 10px; height: 3px; background: #1e3324; border-radius: 2px; overflow: hidden; }
-.arrival-fill { height: 100%; background: #4ade80; border-radius: 2px; transition: width 0.5s; width: 0%; }
+.nav-dist-unit { font-size: 11px; color: #7070A0; }
+.arrival-bar { margin-top: 10px; height: 3px; background: #2A2A3D; border-radius: 2px; overflow: hidden; }
+.arrival-fill { height: 100%; background: #F44019; border-radius: 2px; transition: width 0.5s; width: 0%; }
 
 /* STATS ROW */
 .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 14px 0; }
-.stat-card { background: #111a13; border: 0.5px solid #1e3324; border-radius: 10px; padding: 10px 10px 8px; }
-.stat-label { font-size: 10px; color: #6b8c72; margin-bottom: 4px; }
+.stat-card { background: #1E1E2E; border: 0.5px solid #2A2A3D; border-radius: 10px; padding: 10px 10px 8px; }
+.stat-label { font-size: 10px; color: #7070A0; margin-bottom: 4px; }
 .stat-val { font-size: 18px; font-weight: 600; color: #e8f5e9; line-height: 1; }
-.stat-unit { font-size: 10px; color: #6b8c72; font-weight: 400; }
+.stat-unit { font-size: 10px; color: #7070A0; font-weight: 400; }
 
 /* ALERT */
-.alert-bar { display: none; margin: 10px 14px 0; background: #0f2b1a; border: 0.5px solid #1e6e38; border-radius: 10px; padding: 9px 12px; font-size: 12px; color: #86efac; }
+.alert-bar { display: none; margin: 10px 14px 0; background: #1A1428; border: 0.5px solid #c43315; border-radius: 10px; padding: 9px 12px; font-size: 12px; color: #FFA07A; }
 .alert-bar.danger { background: #1a0f0f; border-color: #7f1d1d; color: #fca5a5; }
 
 /* SECTION */
 .section { padding: 12px 14px 0; }
-.section-title { font-size: 11px; color: #4ade80; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
-.wp-count { background: #0d2b16; color: #4ade80; font-size: 10px; padding: 2px 7px; border-radius: 20px; border: 0.5px solid #1e6e38; }
+.section-title { font-size: 11px; color: #F44019; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+.wp-count { background: #14142A; color: #F44019; font-size: 10px; padding: 2px 7px; border-radius: 20px; border: 0.5px solid #c43315; }
 
 /* WAYPOINT LIST */
 .wp-list { display: flex; flex-direction: column; gap: 6px; }
-.wp-item { background: #111a13; border: 0.5px solid #1e3324; border-radius: 10px; padding: 9px 12px; display: flex; align-items: center; gap: 10px; }
-.wp-item.active-target { border-color: #4ade80; }
+.wp-item { background: #1E1E2E; border: 0.5px solid #2A2A3D; border-radius: 10px; padding: 9px 12px; display: flex; align-items: center; gap: 10px; }
+.wp-item.active-target { border-color: #c43315; }
 .wp-num { width: 28px; height: 28px; border-radius: 50%; background: #fbbf24; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #451a03; flex-shrink: 0; }
 .wp-num.target { background: #ef4444; color: #fff; animation: pulse2 1.5s infinite; }
 @keyframes pulse2 { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
 .wp-info { flex: 1; min-width: 0; }
 .wp-name { font-size: 13px; font-weight: 500; color: #e8f5e9; }
-.wp-coord { font-size: 10px; color: #6b8c72; font-family: 'Courier New', monospace; margin-top: 2px; }
+.wp-coord { font-size: 10px; color: #7070A0; font-family: 'Courier New', monospace; margin-top: 2px; }
 .wp-actions { display: flex; gap: 6px; flex-shrink: 0; }
-.wp-btn { background: none; border: 0.5px solid #1e3324; border-radius: 6px; color: #6b8c72; cursor: pointer; padding: 4px 8px; font-size: 11px; }
-.wp-btn:active { background: #1e3324; }
-.wp-btn.nav { color: #4ade80; border-color: #1e6e38; }
-.wp-empty { font-size: 12px; color: #6b8c72; text-align: center; padding: 18px; }
+.wp-btn { background: none; border: 0.5px solid #2A2A3D; border-radius: 6px; color: #7070A0; cursor: pointer; padding: 4px 8px; font-size: 11px; }
+.wp-btn:active { background: #2A2A3D; }
+.wp-btn.nav { color: #F44019; border-color: #c43315; }
+.wp-empty { font-size: 12px; color: #7070A0; text-align: center; padding: 18px; }
 
 /* BUTTONS */
 .btn-section { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
@@ -94,40 +97,40 @@ html, body { height: 100%; background: #0a0f0d; font-family: -apple-system, 'Hel
 .btn { border: none; border-radius: 12px; padding: 14px 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; transition: transform 0.1s, opacity 0.1s; }
 .btn:active { transform: scale(0.97); opacity: 0.85; }
 .btn svg { width: 18px; height: 18px; }
-.btn-pin { background: #15803d; color: #fff; }
-.btn-return { background: #111a13; color: #4ade80; border: 0.5px solid #1e6e38; }
-.btn-stop { display: none; background: #111a13; color: #f87171; border: 0.5px solid #7f1d1d; }
-.btn-reset { background: #111a13; color: #6b8c72; border: 0.5px solid #1e3324; }
+.btn-pin { background: #C8340F; color: #fff; }
+.btn-return { background: #1E1E2E; color: #F44019; border: 0.5px solid #c43315; }
+.btn-stop { display: none; background: #1E1E2E; color: #f87171; border: 0.5px solid #7f1d1d; }
+.btn-reset { background: #1E1E2E; color: #7070A0; border: 0.5px solid #2A2A3D; }
 .btn-full { grid-column: 1 / -1; }
 
 /* COMPASS PERMISSION BTN */
-.perm-btn { display: none; position: absolute; top: 14px; right: 90px; background: #0d2b16; border: 0.5px solid #1e6e38; border-radius: 8px; padding: 6px 10px; font-size: 11px; color: #4ade80; cursor: pointer; }
+.perm-btn { display: none; position: absolute; top: 14px; right: 90px; background: #14142A; border: 0.5px solid #c43315; border-radius: 8px; padding: 6px 10px; font-size: 11px; color: #F44019; cursor: pointer; }
 
 /* TOAST */
-.toast { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 70px); left: 50%; transform: translateX(-50%) translateY(-8px); background: #1a2e1c; border: 0.5px solid #2d6a4f; border-radius: 20px; padding: 8px 16px; font-size: 13px; color: #86efac; white-space: nowrap; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; }
+.toast { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 70px); left: 50%; transform: translateX(-50%) translateY(-8px); background: #1E1828; border: 0.5px solid #8a2408; border-radius: 20px; padding: 8px 16px; font-size: 13px; color: #FFA07A; white-space: nowrap; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast.danger { background: #2d1515; border-color: #7f1d1d; color: #fca5a5; }
 
 /* MODAL */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.show { display: flex; }
-.modal { background: #111a13; border: 0.5px solid #2d6a4f; border-radius: 16px; padding: 20px; width: 100%; max-width: 320px; }
-.modal h3 { font-size: 16px; color: #4ade80; margin-bottom: 14px; }
-.modal input { width: 100%; background: #0a0f0d; border: 0.5px solid #1e6e38; border-radius: 10px; padding: 11px 14px; font-size: 15px; color: #e8f5e9; outline: none; }
-.modal input:focus { border-color: #4ade80; }
-.modal-coord { font-size: 11px; color: #6b8c72; font-family: 'Courier New', monospace; margin: 8px 0 16px; }
+.modal { background: #1E1E2E; border: 0.5px solid #8a2408; border-radius: 16px; padding: 20px; width: 100%; max-width: 320px; }
+.modal h3 { font-size: 16px; color: #F44019; margin-bottom: 14px; }
+.modal input { width: 100%; background: #1C1C29; border: 0.5px solid #c43315; border-radius: 10px; padding: 11px 14px; font-size: 15px; color: #e8f5e9; outline: none; }
+.modal input:focus { border-color: #c43315; }
+.modal-coord { font-size: 11px; color: #7070A0; font-family: 'Courier New', monospace; margin: 8px 0 16px; }
 .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .modal-btn { border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
-.modal-btn.cancel { background: #1e3324; color: #6b8c72; }
-.modal-btn.confirm { background: #15803d; color: #fff; }
+.modal-btn.cancel { background: #2A2A3D; color: #7070A0; }
+.modal-btn.confirm { background: #C8340F; color: #fff; }
 
 /* RESET MODAL */
-.reset-modal { background: #111a13; border: 0.5px solid #7f1d1d; border-radius: 16px; padding: 22px; width: 100%; max-width: 300px; text-align: center; }
+.reset-modal { background: #1E1E2E; border: 0.5px solid #7f1d1d; border-radius: 16px; padding: 22px; width: 100%; max-width: 300px; text-align: center; }
 .reset-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(239,68,68,0.12); border: 0.5px solid rgba(239,68,68,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
 .reset-modal h3 { font-size: 17px; color: #f1f5f9; margin-bottom: 8px; }
-.reset-modal p { font-size: 13px; color: #6b8c72; line-height: 1.6; margin-bottom: 18px; }
+.reset-modal p { font-size: 13px; color: #7070A0; line-height: 1.6; margin-bottom: 18px; }
 .reset-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.reset-btn-cancel { border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; background: #1e3324; color: #6b8c72; }
+.reset-btn-cancel { border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; background: #2A2A3D; color: #7070A0; }
 .reset-btn-confirm { border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; background: #dc2626; color: #fff; }
 </style>
 </head>
@@ -136,11 +139,14 @@ html, body { height: 100%; background: #0a0f0d; font-family: -apple-system, 'Hel
   <!-- HEADER -->
   <div class="header">
     <div class="logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#F44019" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
         <circle cx="12" cy="9" r="2.5"/>
       </svg>
-      TrailBack
+      <div>
+        <div style="font-size:11px;font-weight:400;color:#8a2408;letter-spacing:0.12em;line-height:1;margin-bottom:1px">AMBEX</div>
+        <div style="font-size:16px;font-weight:700;color:#F44019;letter-spacing:0.03em;line-height:1">TrailBack <span style="font-size:10px;font-weight:400;color:#8a2408">V0.1</span></div>
+      </div>
     </div>
     <div class="gps-pill">
       <div class="gps-dot" id="gpsDot"></div>
@@ -153,13 +159,13 @@ html, body { height: 100%; background: #0a0f0d; font-family: -apple-system, 'Hel
     <canvas id="trailCanvas"></canvas>
     <div class="compass">
       <svg viewBox="0 0 68 68">
-        <circle cx="34" cy="34" r="32" fill="#0d1a10" stroke="#2d6a4f" stroke-width="1.5"/>
-        <circle cx="34" cy="34" r="26" fill="none" stroke="#1e3324" stroke-width="0.5"/>
-        <text x="34" y="12" text-anchor="middle" fill="#4ade80" font-size="9" font-weight="700" font-family="-apple-system,sans-serif">N</text>
-        <text x="34" y="62" text-anchor="middle" fill="#6b8c72" font-size="8" font-family="-apple-system,sans-serif">S</text>
-        <text x="8"  y="38" text-anchor="middle" fill="#6b8c72" font-size="8" font-family="-apple-system,sans-serif">W</text>
-        <text x="60" y="38" text-anchor="middle" fill="#6b8c72" font-size="8" font-family="-apple-system,sans-serif">E</text>
-        <g stroke="#1e3324" stroke-width="0.5">
+        <circle cx="34" cy="34" r="32" fill="#16161F" stroke="#8a2408" stroke-width="1.5"/>
+        <circle cx="34" cy="34" r="26" fill="none" stroke="#2A2A3D" stroke-width="0.5"/>
+        <text x="34" y="12" text-anchor="middle" fill="#F44019" font-size="9" font-weight="700" font-family="-apple-system,sans-serif">N</text>
+        <text x="34" y="62" text-anchor="middle" fill="#7070A0" font-size="8" font-family="-apple-system,sans-serif">S</text>
+        <text x="8"  y="38" text-anchor="middle" fill="#7070A0" font-size="8" font-family="-apple-system,sans-serif">W</text>
+        <text x="60" y="38" text-anchor="middle" fill="#7070A0" font-size="8" font-family="-apple-system,sans-serif">E</text>
+        <g stroke="#2A2A3D" stroke-width="0.5">
           <line x1="34" y1="4"  x2="34" y2="10"/>
           <line x1="34" y1="58" x2="34" y2="64"/>
           <line x1="4"  y1="34" x2="10" y2="34"/>
@@ -167,16 +173,16 @@ html, body { height: 100%; background: #0a0f0d; font-family: -apple-system, 'Hel
         </g>
         <g id="compassNeedle" transform="rotate(0 34 34)">
           <polygon points="34,16 31,34 34,31 37,34" fill="#ef4444"/>
-          <polygon points="34,52 31,34 34,37 37,34" fill="#6b8c72"/>
+          <polygon points="34,52 31,34 34,37 37,34" fill="#7070A0"/>
         </g>
-        <circle cx="34" cy="34" r="3" fill="#0d1a10" stroke="#4ade80" stroke-width="1"/>
+        <circle cx="34" cy="34" r="3" fill="#16161F" stroke="#F44019" stroke-width="1"/>
       </svg>
     </div>
     <div class="map-legend">
-      <div class="legend-item"><div class="ldot" style="background:#4ade80"></div>คุณอยู่ที่นี่</div>
+      <div class="legend-item"><div class="ldot" style="background:#F44019"></div>คุณอยู่ที่นี่</div>
       <div class="legend-item"><div class="ldot" style="background:#fbbf24"></div>Waypoints</div>
       <div class="legend-item"><div class="ldot" style="background:#3b82f6"></div>เส้นทางที่เดิน</div>
-      <div class="legend-item" id="returnLegend" style="display:none"><div class="ldot" style="background:#4ade80"></div>เส้นนำทางกลับ</div>
+      <div class="legend-item" id="returnLegend" style="display:none"><div class="ldot" style="background:#F44019"></div>เส้นนำทางกลับ</div>
     </div>
     <div class="scale-bar">
       <div class="scale-line" id="scaleLine"></div>
@@ -192,7 +198,7 @@ html, body { height: 100%; background: #0a0f0d; font-family: -apple-system, 'Hel
       <div class="nav-row">
         <div class="arrow-circle">
           <svg id="navArrowSvg" viewBox="0 0 32 32" width="32" height="32">
-            <polygon id="navArrow" points="16,5 26,26 16,21 6,26" fill="#4ade80"/>
+            <polygon id="navArrow" points="16,5 26,26 16,21 6,26" fill="#F44019"/>
           </svg>
         </div>
         <div class="nav-meta">
@@ -408,11 +414,11 @@ function drawMap() {
   ctx.clearRect(0, 0, W, H);
 
   // background
-  ctx.fillStyle = '#0d1a10';
+  ctx.fillStyle = '#16161F';
   ctx.fillRect(0, 0, W, H);
 
   // grid
-  ctx.strokeStyle = '#111e12';
+  ctx.strokeStyle = '#1A1A28';
   ctx.lineWidth = 0.5;
   for (let i = 0; i < 10; i++) {
     ctx.beginPath(); ctx.moveTo(W*i/10, 0); ctx.lineTo(W*i/10, H); ctx.stroke();
@@ -430,7 +436,7 @@ function drawMap() {
       const p = project(trail[i], bn, W, H);
       ctx.lineTo(p.x, p.y);
     }
-    ctx.strokeStyle = '#3b82f6';
+    ctx.strokeStyle = '#5B8AFF';
     ctx.lineWidth = 2.5;
     ctx.setLineDash([]);
     ctx.lineCap = 'round';
@@ -445,7 +451,7 @@ function drawMap() {
     const tp = project({ lat: wp.lat, lon: wp.lon }, bn, W, H);
     ctx.beginPath();
     ctx.setLineDash([8, 5]);
-    ctx.strokeStyle = '#4ade80';
+    ctx.strokeStyle = '#F44019';
     ctx.lineWidth = 2;
     ctx.moveTo(cp.x, cp.y);
     ctx.lineTo(tp.x, tp.y);
@@ -474,7 +480,7 @@ function drawMap() {
     ctx.stroke();
 
     ctx.fillStyle = isTarget ? '#fff' : '#451a03';
-    ctx.font = 'bold 10px -apple-system,sans-serif';
+    ctx.font = 'bold 10px Anuphan,-apple-system,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(i + 1, p.x, p.y);
@@ -482,7 +488,7 @@ function drawMap() {
     // label
     const lbl = wp.label.length > 8 ? wp.label.slice(0,8)+'…' : wp.label;
     ctx.fillStyle = '#fbbf24';
-    ctx.font = '10px -apple-system,sans-serif';
+    ctx.font = '10px Anuphan,-apple-system,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(lbl, p.x, p.y + 13);
@@ -499,9 +505,9 @@ function drawMap() {
       if (accPx > 0 && accPx < 200) {
         ctx.beginPath();
         ctx.arc(cp.x, cp.y, accPx, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(74,222,128,0.06)';
+        ctx.fillStyle = 'rgba(244,64,25,0.06)';
         ctx.fill();
-        ctx.strokeStyle = 'rgba(74,222,128,0.2)';
+        ctx.strokeStyle = 'rgba(244,64,25,0.2)';
         ctx.lineWidth = 1;
         ctx.stroke();
       }
@@ -512,21 +518,21 @@ function drawMap() {
     ctx.beginPath();
     ctx.moveTo(cp.x, cp.y);
     ctx.lineTo(cp.x + Math.sin(hRad)*24, cp.y - Math.cos(hRad)*24);
-    ctx.strokeStyle = 'rgba(74,222,128,0.5)';
+    ctx.strokeStyle = 'rgba(244,64,25,0.5)';
     ctx.lineWidth = 2;
     ctx.stroke();
 
     // pulse ring
     ctx.beginPath();
     ctx.arc(cp.x, cp.y, 16, 0, Math.PI*2);
-    ctx.strokeStyle = 'rgba(74,222,128,0.3)';
+    ctx.strokeStyle = 'rgba(244,64,25,0.3)';
     ctx.lineWidth = 3;
     ctx.stroke();
 
     // dot
     ctx.beginPath();
     ctx.arc(cp.x, cp.y, 9, 0, Math.PI*2);
-    ctx.fillStyle = '#4ade80';
+    ctx.fillStyle = '#F44019';
     ctx.fill();
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 2;
@@ -535,13 +541,13 @@ function drawMap() {
 
   // empty state
   if (!currentPos && trail.length === 0) {
-    ctx.fillStyle = '#1e3324';
-    ctx.font = '13px -apple-system,sans-serif';
+    ctx.fillStyle = '#3A2A50';
+    ctx.font = '13px Anuphan,-apple-system,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('กำลังรอสัญญาณ GPS...', W/2, H/2 - 12);
-    ctx.fillStyle = '#6b8c72';
-    ctx.font = '11px -apple-system,sans-serif';
+    ctx.fillStyle = '#7070A0';
+    ctx.font = '11px Anuphan,-apple-system,sans-serif';
     ctx.fillText('กรุณาให้สิทธิ์ตำแหน่งแก่ app นี้', W/2, H/2 + 12);
   }
 
