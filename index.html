@@ -131,7 +131,49 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
 .sunset-bar.warning .sunset-progress { background: rgba(186,117,23,0.6); }
 .sunset-bar.critical .sunset-progress { background: rgba(228,74,74,0.7); }
 
-/* TOAST */
+/* NAV VIEW FULLSCREEN */
+.nav-view { display: none; position: fixed; inset: 0; background: #1C1C29; z-index: 150; flex-direction: column; align-items: center; justify-content: space-between; padding: calc(env(safe-area-inset-top,16px) + 16px) 20px calc(env(safe-area-inset-bottom,16px) + 16px); }
+.nav-view.show { display: flex; }
+
+.nv-top { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.nv-close { background: rgba(255,255,255,0.06); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #7070A0; font-size: 18px; }
+.nv-target { text-align: center; flex: 1; }
+.nv-target-label { font-size: 11px; color: #7070A0; letter-spacing: .06em; text-transform: uppercase; }
+.nv-target-name { font-size: 15px; font-weight: 600; color: #e8f5e9; margin-top: 2px; }
+
+/* BIG ARROW AREA */
+.nv-arrow-area { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 0; position: relative; }
+
+.nv-direction-text { font-size: 28px; font-weight: 700; color: #e8f5e9; margin-bottom: 16px; letter-spacing: -0.01em; text-align: center; }
+
+/* Arrow SVG container */
+.nv-arrow-wrap { position: relative; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; }
+.nv-arrow-glow { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, rgba(244,64,25,0.18) 0%, rgba(244,64,25,0) 70%); animation: arrowGlow 2s ease-in-out infinite; }
+@keyframes arrowGlow { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.1);opacity:0.6} }
+.nv-arrow-svg { width: 160px; height: 160px; transition: transform 0.4s cubic-bezier(.34,1.56,.64,1); }
+
+/* Distance badge */
+.nv-dist-badge { margin-top: 20px; text-align: center; }
+.nv-dist-num { font-size: 52px; font-weight: 700; color: #F44019; line-height: 1; font-variant-numeric: tabular-nums; }
+.nv-dist-unit { font-size: 16px; color: #7070A0; font-weight: 400; margin-top: 4px; }
+
+/* Progress ring */
+.nv-ring-wrap { position: relative; width: 56px; height: 56px; margin-top: 16px; }
+.nv-ring-bg { fill: none; stroke: #2A2A3D; stroke-width: 4; }
+.nv-ring-fill { fill: none; stroke: #F44019; stroke-width: 4; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 0.6s ease; }
+.nv-ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #F44019; }
+
+/* Bottom stats */
+.nv-bottom { width: 100%; }
+.nv-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.nv-stat { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 8px; text-align: center; }
+.nv-stat-label { font-size: 10px; color: #7070A0; margin-bottom: 3px; }
+.nv-stat-val { font-size: 15px; font-weight: 600; color: #e8f5e9; font-variant-numeric: tabular-nums; }
+.nv-stop-btn { width: 100%; border: none; border-radius: 14px; padding: 15px; background: rgba(239,68,68,0.12); color: #f87171; border: 0.5px solid rgba(239,68,68,0.3); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Anuphan', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.nv-stop-btn svg { width: 18px; height: 18px; }
+
+/* toggle nav view button */
+.btn-navview { background: linear-gradient(135deg, #C8340F, #F44019); color: #fff; box-shadow: 0 4px 20px rgba(244,64,25,.35); }
 .toast { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 70px); left: 50%; transform: translateX(-50%) translateY(-8px); background: #1E1828; border: 0.5px solid #8a2408; border-radius: 20px; padding: 8px 16px; font-size: 13px; color: #FFA07A; white-space: nowrap; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast.danger { background: #2d1515; border-color: #7f1d1d; color: #fca5a5; }
@@ -303,6 +345,12 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
           หยุดนำทาง
         </button>
       </div>
+      <div class="btn-row" id="navViewBtnRow" style="display:none">
+        <button class="btn btn-navview btn-full" onclick="openNavView()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          เปิดหน้านำทาง
+        </button>
+      </div>
       <div class="btn-row">
         <button class="btn btn-reset btn-full" onclick="openResetModal()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -310,6 +358,79 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
         </button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- NAV VIEW FULLSCREEN -->
+<div class="nav-view" id="navView">
+  <!-- Top bar -->
+  <div class="nv-top">
+    <button class="nv-close" onclick="closeNavView()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="nv-target">
+      <div class="nv-target-label">มุ่งหน้าไป</div>
+      <div class="nv-target-name" id="nvTargetName">WP1</div>
+    </div>
+    <div style="width:40px"></div>
+  </div>
+
+  <!-- Arrow area -->
+  <div class="nv-arrow-area">
+    <div class="nv-direction-text" id="nvDirectionText">เดินตรงไป</div>
+    <div class="nv-arrow-wrap">
+      <div class="nv-arrow-glow"></div>
+      <svg class="nv-arrow-svg" id="nvArrowSvg" viewBox="0 0 160 160">
+        <!-- กลุ่มหลักหมุนทั้งหมด -->
+        <g id="nvArrowGroup" transform="rotate(0 80 80)">
+          <!-- เงา -->
+          <polygon points="80,14 130,120 80,96 30,120" fill="rgba(244,64,25,0.18)" transform="translate(4,6)"/>
+          <!-- ลูกศรหลัก -->
+          <polygon points="80,14 130,120 80,96 30,120" fill="#F44019"/>
+          <!-- ไฮไลต์ขอบ -->
+          <polygon points="80,14 130,120 80,96 30,120" fill="none" stroke="rgba(255,180,160,0.4)" stroke-width="2" stroke-linejoin="round"/>
+          <!-- ไฮไลต์ด้านซ้าย -->
+          <polygon points="80,14 80,96 30,120" fill="rgba(255,255,255,0.08)"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="nv-dist-badge">
+      <div class="nv-dist-num" id="nvDistNum">—</div>
+      <div class="nv-dist-unit" id="nvDistUnit">เมตร</div>
+    </div>
+
+    <!-- Progress ring -->
+    <div class="nv-ring-wrap">
+      <svg width="56" height="56" viewBox="0 0 56 56">
+        <circle class="nv-ring-bg" cx="28" cy="28" r="24"/>
+        <circle class="nv-ring-fill" id="nvRingFill" cx="28" cy="28" r="24"
+          stroke-dasharray="150.8" stroke-dashoffset="150.8"/>
+      </svg>
+      <div class="nv-ring-pct" id="nvRingPct">0%</div>
+    </div>
+  </div>
+
+  <!-- Bottom stats + stop -->
+  <div class="nv-bottom">
+    <div class="nv-stats">
+      <div class="nv-stat">
+        <div class="nv-stat-label">ทิศทาง</div>
+        <div class="nv-stat-val" id="nvBearing">—°</div>
+      </div>
+      <div class="nv-stat">
+        <div class="nv-stat-label">เข็มทิศ</div>
+        <div class="nv-stat-val" id="nvHeading">—°</div>
+      </div>
+      <div class="nv-stat">
+        <div class="nv-stat-label">GPS</div>
+        <div class="nv-stat-val" id="nvAcc">—ม.</div>
+      </div>
+    </div>
+    <button class="nv-stop-btn" onclick="stopReturnFromNavView()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      หยุดนำทาง
+    </button>
   </div>
 </div>
 
@@ -726,6 +847,63 @@ function initCompass() {
   }
 }
 
+// ── NAVIGATION VIEW ───────────────────────────────────────────────
+let navViewOpen = false;
+
+function openNavView() {
+  if (!navigating) return;
+  navViewOpen = true;
+  document.getElementById('navView').classList.add('show');
+  updateNavView();
+}
+
+function closeNavView() {
+  navViewOpen = false;
+  document.getElementById('navView').classList.remove('show');
+}
+
+function stopReturnFromNavView() {
+  closeNavView();
+  stopReturn();
+}
+
+const CIRCUMFERENCE = 2 * Math.PI * 24; // r=24
+
+function updateNavView() {
+  if (!navViewOpen || !navigating || !currentPos || targetIndex < 0 || targetIndex >= waypoints.length) return;
+
+  const wp = waypoints[targetIndex];
+  const dist = haversine(currentPos, { lat: wp.lat, lon: wp.lon });
+  const bear = bearingTo(currentPos, { lat: wp.lat, lon: wp.lon });
+  const rel = ((bear - heading) + 360) % 360;
+
+  // direction text + arrow rotation
+  const dirList = ['เดินตรงไป','เฉียงขวา','เลี้ยวขวา','เฉียงขวามาก','หันกลับ','เฉียงซ้ายมาก','เลี้ยวซ้าย','เฉียงซ้าย'];
+  document.getElementById('nvDirectionText').textContent = dirList[Math.round(rel / 45) % 8];
+
+  // rotate arrow smoothly
+  document.getElementById('nvArrowGroup').setAttribute('transform', `rotate(${rel} 80 80)`);
+
+  // distance
+  const d = fmtDist(dist);
+  document.getElementById('nvDistNum').textContent = d.val;
+  document.getElementById('nvDistUnit').textContent = d.unit;
+
+  // target name
+  document.getElementById('nvTargetName').textContent = 'WP' + (targetIndex+1) + ' — ' + wp.label;
+
+  // progress ring
+  const pct = startDistance > 0 ? Math.max(0, Math.min(100, (1 - dist/startDistance)*100)) : 0;
+  const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+  document.getElementById('nvRingFill').style.strokeDashoffset = offset;
+  document.getElementById('nvRingPct').textContent = Math.round(pct) + '%';
+
+  // stats
+  document.getElementById('nvBearing').textContent = Math.round(bear) + '°';
+  document.getElementById('nvHeading').textContent = Math.round(heading) + '°';
+  document.getElementById('nvAcc').textContent = currentPos.acc ? '±' + Math.round(currentPos.acc) + 'ม.' : '—';
+}
+
 // ── NAVIGATION ────────────────────────────────────────────────────
 function updateNav() {
   if (!navigating || !currentPos || targetIndex < 0 || targetIndex >= waypoints.length) return;
@@ -763,6 +941,9 @@ function updateNav() {
       stopReturn();
     }
   }
+
+  // sync nav view ถ้าเปิดอยู่
+  updateNavView();
 }
 
 function startReturn() {
@@ -774,6 +955,7 @@ function startReturn() {
   document.getElementById('navCard').style.display = 'block';
   document.getElementById('stopBtn').style.display = 'flex';
   document.getElementById('returnLegend').style.display = 'flex';
+  document.getElementById('navViewBtnRow').style.display = '';
   renderWpList();
   updateNav();
   drawMap();
@@ -784,9 +966,12 @@ function stopReturn() {
   navigating = false;
   targetIndex = -1;
   startDistance = null;
+  navViewOpen = false;
+  document.getElementById('navView').classList.remove('show');
   document.getElementById('navCard').style.display = 'none';
   document.getElementById('stopBtn').style.display = 'none';
   document.getElementById('returnLegend').style.display = 'none';
+  document.getElementById('navViewBtnRow').style.display = 'none';
   document.getElementById('arrivalFill').style.width = '0%';
   renderWpList();
   drawMap();
@@ -862,6 +1047,7 @@ function navToWp(i) {
   document.getElementById('navCard').style.display = 'block';
   document.getElementById('stopBtn').style.display = 'flex';
   document.getElementById('returnLegend').style.display = 'flex';
+  document.getElementById('navViewBtnRow').style.display = '';
   renderWpList();
   updateNav();
   drawMap();
