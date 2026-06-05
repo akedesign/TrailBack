@@ -11,10 +11,10 @@
 <title>Ambex TrailBack V0.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-system, 'Helvetica Neue', sans-serif; color: #e8f5e9; overflow: hidden; }
+html, body { height: 100%; background: #1C1C29; font-family: 'Kanit', -apple-system, 'Helvetica Neue', sans-serif; font-weight: 300; color: #e8f5e9; overflow: hidden; }
 .app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
 
 /* HEADER */
@@ -97,14 +97,18 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
 /* BUTTONS */
 .btn-section { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
 .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.btn { border: none; border-radius: 12px; padding: 14px 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; transition: transform 0.1s, opacity 0.1s; }
+.btn { border: none; border-radius: 12px; padding: 14px 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; transition: transform 0.1s, opacity 0.1s; font-family: 'Kanit', sans-serif; }
 .btn:active { transform: scale(0.97); opacity: 0.85; }
 .btn svg { width: 18px; height: 18px; }
 .btn-pin { background: #C8340F; color: #fff; }
 .btn-return { background: #1E1E2E; color: #F44019; border: 0.5px solid #c43315; }
 .btn-stop { display: none; background: #1E1E2E; color: #f87171; border: 0.5px solid #7f1d1d; }
 .btn-reset { background: #1E1E2E; color: #7070A0; border: 0.5px solid #2A2A3D; }
+.btn-survival { background: #1E1E2E; color: #EF9F27; border: 0.5px solid rgba(186,117,23,0.4); }
 .btn-full { grid-column: 1 / -1; }
+
+/* force Kanit on ALL button/input elements */
+button, input, select, textarea { font-family: 'Kanit', sans-serif; font-weight: 300; }
 
 /* COMPASS PERMISSION BTN */
 .perm-btn { display: none; position: absolute; top: 14px; right: 90px; background: #14142A; border: 0.5px solid #c43315; border-radius: 8px; padding: 6px 10px; font-size: 11px; color: #F44019; cursor: pointer; }
@@ -169,11 +173,45 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
 .nv-stat { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 8px; text-align: center; }
 .nv-stat-label { font-size: 10px; color: #7070A0; margin-bottom: 3px; }
 .nv-stat-val { font-size: 15px; font-weight: 600; color: #e8f5e9; font-variant-numeric: tabular-nums; }
-.nv-stop-btn { width: 100%; border: none; border-radius: 14px; padding: 15px; background: rgba(239,68,68,0.12); color: #f87171; border: 0.5px solid rgba(239,68,68,0.3); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Anuphan', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.nv-stop-btn { width: 100%; border: none; border-radius: 14px; padding: 15px; background: rgba(239,68,68,0.12); color: #f87171; border: 0.5px solid rgba(239,68,68,0.3); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Kanit', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .nv-stop-btn svg { width: 18px; height: 18px; }
 
 /* toggle nav view button */
 .btn-navview { background: linear-gradient(135deg, #C8340F, #F44019); color: #fff; box-shadow: 0 4px 20px rgba(244,64,25,.35); }
+/* SURVIVAL GUIDE MODAL */
+.survival-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 250; flex-direction: column; }
+.survival-ov.show { display: flex; }
+.survival-sheet { background: #1C1C29; flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-top: calc(env(safe-area-inset-top,0px) + 48px); border-radius: 20px 20px 0 0; border-top: 0.5px solid rgba(255,255,255,0.1); }
+.survival-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 12px; border-bottom: 0.5px solid #2A2A3D; flex-shrink: 0; }
+.survival-header h2 { font-size: 17px; font-weight: 600; color: #EF9F27; display: flex; align-items: center; gap: 8px; }
+.survival-close { background: rgba(255,255,255,0.06); border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #7070A0; font-size: 16px; font-family: 'Kanit', sans-serif; }
+.sv-tabs { display: flex; gap: 6px; padding: 10px 14px; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
+.sv-tabs::-webkit-scrollbar { display: none; }
+.sv-tab { flex-shrink: 0; background: #1E1E2E; border: 0.5px solid #2A2A3D; border-radius: 20px; padding: 6px 14px; font-size: 12px; color: #7070A0; cursor: pointer; font-family: 'Kanit', sans-serif; font-weight: 300; transition: all .2s; }
+.sv-tab.active { background: rgba(186,117,23,0.2); border-color: rgba(186,117,23,0.5); color: #EF9F27; }
+.sv-content { flex: 1; overflow-y: auto; padding: 14px 16px 24px; -webkit-overflow-scrolling: touch; }
+.sv-page { display: none; }
+.sv-page.show { display: block; }
+.sv-card { background: #1E1E2E; border-radius: 12px; padding: 14px; margin-bottom: 10px; border-left: 3px solid #2A2A3D; }
+.sv-card.danger { border-left-color: #ef4444; }
+.sv-card.warning { border-left-color: #EF9F27; }
+.sv-card.info { border-left-color: #60a5fa; }
+.sv-card.success { border-left-color: #4ade80; }
+.sv-card-title { font-size: 13px; font-weight: 600; color: #e8f5e9; margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+.sv-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 7px; font-size: 12px; color: #94a3b8; line-height: 1.6; }
+.sv-item:last-child { margin-bottom: 0; }
+.sv-bullet { width: 5px; height: 5px; border-radius: 50%; background: #EF9F27; flex-shrink: 0; margin-top: 6px; }
+.sv-bullet.red { background: #ef4444; }
+.sv-bullet.blue { background: #60a5fa; }
+.sv-bullet.green { background: #4ade80; }
+.sv-section-label { font-size: 10px; color: #7070A0; letter-spacing: .08em; text-transform: uppercase; margin: 16px 0 8px; }
+.sv-morse { font-family: 'Courier New', monospace; font-size: 22px; color: #F44019; letter-spacing: 6px; text-align: center; padding: 14px; background: #14142A; border-radius: 8px; margin: 8px 0; }
+.sv-morse-label { font-size: 11px; color: #7070A0; text-align: center; margin-bottom: 4px; }
+.sv-highlight { background: rgba(239,68,68,0.1); border: 0.5px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; color: #fca5a5; text-align: center; font-weight: 500; line-height: 1.6; }
+.sv-rule { display: flex; align-items: center; gap: 10px; background: #14142A; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+.sv-rule-num { width: 28px; height: 28px; border-radius: 50%; background: rgba(244,64,25,0.15); border: 0.5px solid rgba(244,64,25,0.4); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #F44019; flex-shrink: 0; }
+.sv-rule-text { font-size: 12px; color: #e8f5e9; line-height: 1.5; }
+
 .toast { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 70px); left: 50%; transform: translateX(-50%) translateY(-8px); background: #1E1828; border: 0.5px solid #8a2408; border-radius: 20px; padding: 8px 16px; font-size: 13px; color: #FFA07A; white-space: nowrap; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast.danger { background: #2d1515; border-color: #7f1d1d; color: #fca5a5; }
@@ -187,7 +225,7 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
 .modal input:focus { border-color: #c43315; }
 .modal-coord { font-size: 11px; color: #7070A0; font-family: 'Courier New', monospace; margin: 8px 0 16px; }
 .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.modal-btn { border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.modal-btn { border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Kanit', sans-serif; }
 .modal-btn.cancel { background: #2A2A3D; color: #7070A0; }
 .modal-btn.confirm { background: #C8340F; color: #fff; }
 
@@ -197,8 +235,8 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
 .reset-modal h3 { font-size: 17px; color: #f1f5f9; margin-bottom: 8px; }
 .reset-modal p { font-size: 13px; color: #7070A0; line-height: 1.6; margin-bottom: 18px; }
 .reset-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.reset-btn-cancel { border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; background: #2A2A3D; color: #7070A0; }
-.reset-btn-confirm { border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; background: #dc2626; color: #fff; }
+.reset-btn-cancel { border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; background: #2A2A3D; color: #7070A0; font-family: 'Kanit', sans-serif; }
+.reset-btn-confirm { border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; background: #dc2626; color: #fff; font-family: 'Kanit', sans-serif; }
 </style>
 </head>
 <body>
@@ -357,6 +395,12 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
           รีเซ็ทข้อมูล
         </button>
       </div>
+      <div class="btn-row">
+        <button class="btn btn-survival btn-full" onclick="openSurvival()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          คู่มือเอาตัวรอด
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -433,6 +477,168 @@ html, body { height: 100%; background: #1C1C29; font-family: 'Anuphan', -apple-s
     </button>
   </div>
 </div>
+
+<!-- SURVIVAL GUIDE -->
+<div class="survival-ov" id="survivalModal">
+  <div class="survival-sheet">
+    <div class="survival-header">
+      <h2>🏕️ คู่มือเอาตัวรอด</h2>
+      <button class="survival-close" onclick="closeSurvival()">✕</button>
+    </div>
+    <div class="sv-tabs">
+      <div class="sv-tab active" onclick="svTab(0)">🆘 ฉุกเฉิน</div>
+      <div class="sv-tab" onclick="svTab(1)">💧 น้ำ&อาหาร</div>
+      <div class="sv-tab" onclick="svTab(2)">🌙 ค้างคืน</div>
+      <div class="sv-tab" onclick="svTab(3)">🧭 ทิศทาง</div>
+      <div class="sv-tab" onclick="svTab(4)">🩹 ปฐมพยาบาล</div>
+    </div>
+    <div class="sv-content">
+
+      <!-- PAGE 0: ฉุกเฉิน -->
+      <div class="sv-page show" id="svp0">
+        <div class="sv-highlight">หยุดเดิน — หายใจ — ประเมินสถานการณ์<br>อย่าตื่นตกใจ สติคือสิ่งสำคัญที่สุด</div>
+
+        <div class="sv-card danger">
+          <div class="sv-card-title"><span class="icon">📡</span>สัญญาณขอความช่วยเหลือ</div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>กฎ 3 ครั้ง — ส่งสัญญาณ 3 ครั้งเสมอ ไม่ว่าจะเป็นเสียง แสง หรือควัน (3 = ต้องการความช่วยเหลือ)</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>เป่านกหวีดหรือตะโกน 3 ครั้ง หยุด แล้วทำซ้ำ รอฟังเสียงตอบ</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ไฟหรือแสงไฟฉาย 3 ครั้ง กะพริบช้าๆ ทุก 10 วินาที มองเห็นได้ไกลหลายกิโลตอนกลางคืน</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ควันไฟ — กองไฟเล็กใส่ใบไม้สดจะให้ควันขาวมากในเวลากลางวัน</div></div>
+        </div>
+
+        <div class="sv-card danger">
+          <div class="sv-card-title"><span class="icon">📟</span>สัญญาณ Morse SOS</div>
+          <div class="sv-morse-label">กระพริบไฟหรือเคาะตามจังหวะ</div>
+          <div class="sv-morse">· · · — — — · · ·</div>
+          <div class="sv-morse-label">สั้น สั้น สั้น | ยาว ยาว ยาว | สั้น สั้น สั้น</div>
+        </div>
+
+        <div class="sv-card warning">
+          <div class="sv-card-title"><span class="icon">🧠</span>กฎ STOP</div>
+          <div class="sv-rule"><div class="sv-rule-num">S</div><div class="sv-rule-text"><b style="color:#e8f5e9">Stop</b> — หยุดเดินทันที อย่าเดินต่อจนกว่าจะมีแผน</div></div>
+          <div class="sv-rule"><div class="sv-rule-num">T</div><div class="sv-rule-text"><b style="color:#e8f5e9">Think</b> — คิดและประเมินสถานการณ์รอบด้าน</div></div>
+          <div class="sv-rule"><div class="sv-rule-num">O</div><div class="sv-rule-text"><b style="color:#e8f5e9">Observe</b> — สังเกตสภาพแวดล้อม ทิศทาง เส้นทางที่มา</div></div>
+          <div class="sv-rule"><div class="sv-rule-num">P</div><div class="sv-rule-text"><b style="color:#e8f5e9">Plan</b> — วางแผนก่อนลงมือทำทุกครั้ง</div></div>
+        </div>
+
+        <div class="sv-card warning">
+          <div class="sv-card-title"><span class="icon">⚠️</span>ห้ามทำเด็ดขาด</div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ห้ามเดินตอนกลางคืนโดยเด็ดขาด เสี่ยงตกเหว หรือหลงทางหนักขึ้น</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ห้ามดื่มน้ำนิ่งหรือน้ำขุ่น โดยไม่ต้มหรือฆ่าเชื้อก่อน</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ห้ามกินพืชหรือผลไม้ที่ไม่รู้จัก ถึงแม้จะหิวมาก</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ห้ามแยกกลุ่มเด็ดขาด ถ้ามากับคนอื่น</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ห้ามนอนบนพื้นดินโดยตรง กันความเย็นและสัตว์ด้วยใบไม้หรือกิ่งไม้รอง</div></div>
+        </div>
+      </div>
+
+      <!-- PAGE 1: น้ำ&อาหาร -->
+      <div class="sv-page" id="svp1">
+        <div class="sv-card info">
+          <div class="sv-card-title"><span class="icon">💧</span>การหาน้ำ</div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ลำธารหรือน้ำไหล ดีกว่าน้ำนิ่งเสมอ ไหลตามเนินลงหาแหล่งน้ำได้</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>น้ำค้างบนใบไม้ตอนเช้า — เช็ดด้วยผ้าแล้วบีบใส่ภาชนะ</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ขุดดินชื้นในร่องน้ำที่แห้ง บางครั้งมีน้ำซึมออกมา</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ฟังเสียงน้ำ — นกและสัตว์มักอยู่ใกล้แหล่งน้ำ ติดตามเส้นทางสัตว์ได้</div></div>
+        </div>
+
+        <div class="sv-card warning">
+          <div class="sv-card-title"><span class="icon">🔥</span>การทำน้ำให้ปลอดภัย</div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>ต้มให้เดือดนาน 1 นาที (บนภูเขาสูงต้มนาน 3 นาที)</div></div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>กรองผ่านผ้าหนาๆ ก่อนต้ม ช่วยเอาตะกอนออก</div></div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>ร่างกายอยู่ได้ 3 วันโดยไม่มีน้ำ แต่ประสิทธิภาพลดทันทีที่ขาดน้ำ</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ห้ามดื่มน้ำทะเลหรือปัสสาวะ จะทำให้ขาดน้ำหนักขึ้น</div></div>
+        </div>
+
+        <div class="sv-card success">
+          <div class="sv-card-title"><span class="icon">🍃</span>อาหารฉุกเฉิน</div>
+          <div class="sv-item"><div class="sv-bullet green"></div><div>น้ำหนักสำคัญกว่าอาหาร — ร่างกายอยู่ได้ 3 สัปดาห์โดยไม่มีอาหาร</div></div>
+          <div class="sv-item"><div class="sv-bullet green"></div><div>หอยทาก แมลง หนอน — แหล่งโปรตีนฉุกเฉิน ต้องปรุงสุกก่อน</div></div>
+          <div class="sv-item"><div class="sv-bullet green"></div><div>ผลไม้ที่นกกิน มักปลอดภัยสำหรับมนุษย์ด้วย</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>หลีกเลี่ยงพืชที่มีน้ำยางขาว ใบหยัก กลิ่นแปลก หรือรสขม</div></div>
+        </div>
+      </div>
+
+      <!-- PAGE 2: ค้างคืน -->
+      <div class="sv-page" id="svp2">
+        <div class="sv-card warning">
+          <div class="sv-card-title"><span class="icon">🌙</span>เตรียมก่อนมืด</div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>เริ่มหาที่พักก่อนพระอาทิตย์ตก 1–2 ชั่วโมง อย่ารอให้มืดสนิท</div></div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>เลือกพื้นที่สูงกว่าระดับพื้น หลีกเลี่ยงร่องน้ำ (น้ำหลากกลางดึก)</div></div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>เลือกบริเวณที่มีต้นไม้ขนาดกลาง บังลมได้ดีและไม่มีกิ่งใหญ่จะหัก</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>หลีกเลี่ยงยอดเขา ต้นไม้โดดเดี่ยว และพื้นที่โล่ง เสี่ยงฟ้าผ่า</div></div>
+        </div>
+
+        <div class="sv-card info">
+          <div class="sv-card-title"><span class="icon">🏠</span>ทำที่พักฉุกเฉิน</div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>Lean-to Shelter — พิงกิ่งใหญ่บนต้นไม้ 2 ต้น วางกิ่งไม้ทับกันเป็นชั้นหลังคา</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ใบไม้แห้งกองหนา 30 ซม. รองพื้น กันความเย็น สำคัญมาก</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ก่อไฟหน้าที่พัก ห่างพอประมาณ ให้ความอบอุ่นและไล่สัตว์</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ถุงดำ (ถ้ามี) — สวมเป็นเสื้อกันลม หรือคลุมตัวกันความเย็น</div></div>
+        </div>
+
+        <div class="sv-card success">
+          <div class="sv-card-title"><span class="icon">🔥</span>การก่อไฟ</div>
+          <div class="sv-item"><div class="sv-bullet green"></div><div>เริ่มจากเส้นใยแห้ง → กิ่งเล็ก → กิ่งกลาง → ฟืนใหญ่ ทีละชั้น</div></div>
+          <div class="sv-item"><div class="sv-bullet green"></div><div>ป้องกันลมด้วยหิน 3 ก้อนล้อมรอบ ช่วยให้ไฟติดง่ายขึ้นมาก</div></div>
+          <div class="sv-item"><div class="sv-bullet green"></div><div>ไม้แห้งแข็ง เช่น ไม้สัก ไม้มะค่า ให้ความร้อนนานกว่าไม้อ่อน</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>อย่าทิ้งไฟโดยไม่ดับ — ก่อนนอนดับด้วยดิน ไม่ใช่น้ำ (น้ำทำให้เถ้าปลิว)</div></div>
+        </div>
+      </div>
+
+      <!-- PAGE 3: ทิศทาง -->
+      <div class="sv-page" id="svp3">
+        <div class="sv-card info">
+          <div class="sv-card-title"><span class="icon">☀️</span>หาทิศจากดวงอาทิตย์</div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>พระอาทิตย์ขึ้น = ทิศตะวันออก / ตก = ทิศตะวันตก เสมอ</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>เที่ยงวัน — เงาชี้ไปทางเหนือ (ซีกโลกเหนือ รวมประเทศไทย)</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>วิธีเงา — ปักไม้ตรง 1 เมตร ทำเครื่องหมายปลายเงา รอ 15 นาที ทำอีกครั้ง เส้นที่ลากระหว่าง 2 จุดชี้ตะวันออก-ตก</div></div>
+        </div>
+
+        <div class="sv-card info">
+          <div class="sv-card-title"><span class="icon">⭐</span>หาทิศจากดาวกลางคืน</div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ดาวเหนือ (Polaris) — ชี้ทิศเหนือเสมอ หาจากกลุ่มดาว Big Dipper (กระบวยน้ำ)</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ลากเส้นจากดาว 2 ดวงปลาย "ช้อน" ไป 5 เท่า จะพบดาวเหนือ</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ในประเทศไทย ดาวเหนืออยู่ต่ำกว่าขอบฟ้ากว่าเขตหนาว มองยากขึ้น</div></div>
+        </div>
+
+        <div class="sv-card warning">
+          <div class="sv-card-title"><span class="icon">🏔️</span>การนำทางในป่า</div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>เดินตามลำน้ำลงต่ำ — มักนำไปสู่ชุมชน ถนน หรือพื้นที่ราบ</div></div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>ขึ้นที่สูง — มองเห็นทิวทัศน์กว้าง ช่วยประเมินเส้นทาง</div></div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>ทำเครื่องหมายต้นไม้หรือหิน เพื่อรู้ว่าเดินวนซ้ำหรือไม่</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>อย่าเดินหากไม่มีทิศ — ยิ่งเดินยิ่งอาจหลงไปไกลขึ้น</div></div>
+        </div>
+      </div>
+
+      <!-- PAGE 4: ปฐมพยาบาล -->
+      <div class="sv-page" id="svp4">
+        <div class="sv-card danger">
+          <div class="sv-card-title"><span class="icon">🩸</span>บาดแผลและเลือดออก</div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>กดแผลด้วยผ้าสะอาดโดยตรง กดนาน 10–15 นาทีโดยไม่ปล่อย</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ล้างแผลด้วยน้ำสะอาดปริมาณมาก ก่อนปิดแผล</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ถ้าเลือดไม่หยุด ใช้เชือกหรือผ้าพันเหนือแผล (tourniquet) จดเวลาไว้</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>ห้ามเอาวัตถุแปลกปลอมออกจากแผลลึก ปล่อยไว้และพยุงรีบหาความช่วยเหลือ</div></div>
+        </div>
+
+        <div class="sv-card warning">
+          <div class="sv-card-title"><span class="icon">🐍</span>สัตว์มีพิษ</div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>งูกัด — อย่าดูดพิษ อย่าผูกรัด อย่าขยับแขนขาที่ถูกกัด นอนนิ่งรีบขอความช่วยเหลือ</div></div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>แมงป่อง/แมงมุม — ล้างด้วยน้ำ สังเกตอาการ ถ้าหน้ามืด หายใจลำบาก รีบขอช่วย</div></div>
+          <div class="sv-item"><div class="sv-bullet"></div><div>ผึ้งต่อย — ดึงเหล็กในออกด้วยเล็บ (ห้ามบีบ) ประคบเย็น ถ้าแพ้รุนแรง ให้นอนราบ</div></div>
+          <div class="sv-item"><div class="sv-bullet blue"></div><div>ป้องกัน — สวมรองเท้าหุ้มข้อ กางเกงขายาว เช็ครองเท้าก่อนสวมทุกครั้ง</div></div>
+        </div>
+
+        <div class="sv-card success">
+          <div class="sv-card-title"><span class="icon">🌡️</span>ฮีตสโตรก & ร่างกายเย็นเกิน</div>
+          <div class="sv-item"><div class="sv-bullet green"></div><div>ฮีตสโตรก — ย้ายเข้าร่ม ดึงเสื้อออก พัดลมด้วยมือ เช็ดตัวด้วยน้ำเย็น ดื่มน้ำมากๆ</div></div>
+          <div class="sv-item"><div class="sv-bullet green"></div><div>Hypothermia (ตัวเย็นเกิน) — เข้าที่อบอุ่น ถอดเสื้อเปียก ห่มด้วยผ้าแห้ง ดื่มน้ำอุ่น</div></div>
+          <div class="sv-item"><div class="sv-bullet red"></div><div>Hypothermia — ห้ามนวดแขนขา ให้ความอบอุ่นที่ลำตัวก่อนเท่านั้น</div></div>
+        </div>
+      </div>
+
+    </div><!-- sv-content -->
+  </div><!-- survival-sheet -->
+</div><!-- survival-ov -->
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -642,7 +848,7 @@ function drawMap() {
     ctx.stroke();
 
     ctx.fillStyle = isTarget ? '#fff' : '#451a03';
-    ctx.font = 'bold 10px Anuphan,-apple-system,sans-serif';
+    ctx.font = 'bold 10px Kanit,-apple-system,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(i + 1, p.x, p.y);
@@ -650,7 +856,7 @@ function drawMap() {
     // label
     const lbl = wp.label.length > 8 ? wp.label.slice(0,8)+'…' : wp.label;
     ctx.fillStyle = '#fbbf24';
-    ctx.font = '10px Anuphan,-apple-system,sans-serif';
+    ctx.font = '10px Kanit,-apple-system,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(lbl, p.x, p.y + 13);
@@ -704,12 +910,12 @@ function drawMap() {
   // empty state
   if (!currentPos && trail.length === 0) {
     ctx.fillStyle = '#3A2A50';
-    ctx.font = '13px Anuphan,-apple-system,sans-serif';
+    ctx.font = '13px Kanit,-apple-system,sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('กำลังรอสัญญาณ GPS...', W/2, H/2 - 12);
     ctx.fillStyle = '#7070A0';
-    ctx.font = '11px Anuphan,-apple-system,sans-serif';
+    ctx.font = '11px Kanit,-apple-system,sans-serif';
     ctx.fillText('กรุณาให้สิทธิ์ตำแหน่งแก่ app นี้', W/2, H/2 + 12);
   }
 
@@ -1232,6 +1438,21 @@ function initSunsetWarning() {
   sunsetInterval = setInterval(updateSunsetWarning, 1000);
   updateSunsetWarning();
 }
+
+// ── SURVIVAL GUIDE ────────────────────────────────────────────────
+function openSurvival() {
+  document.getElementById('survivalModal').classList.add('show');
+}
+function closeSurvival() {
+  document.getElementById('survivalModal').classList.remove('show');
+}
+function svTab(i) {
+  document.querySelectorAll('.sv-tab').forEach((t,idx) => t.className = 'sv-tab' + (idx===i?' active':''));
+  document.querySelectorAll('.sv-page').forEach((p,idx) => p.className = 'sv-page' + (idx===i?' show':''));
+}
+document.getElementById('survivalModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSurvival();
+});
 
 // ── INIT ──────────────────────────────────────────────────────────
 document.addEventListener('touchmove', e => {
